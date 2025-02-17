@@ -12,13 +12,20 @@ OBJ = $(patsubst $(PREFIX_SRC)%.c, $(PREFIX_OBJ)%.o, $(SRC))
 LIBS = $(wildcard $(PREFIX_LIB)*.a)
 TAR = $(PREFIX_BIN)$(TARGET)
 
+
 all : $(TAR)
 
-$(TAR) : $(OBJ)
+$(TAR) : $(OBJ) $(PREFIX_OBJ) $(PREFIX_BIN)
 	$(CC) $(OBJ) -o $(TAR) -L $(PREFIX_LIB) $(LIBS)
+
+$(PREFIX_OBJ):
+	if not exist "$(PREFIX_OBJ)" mkdir "$(PREFIX_OBJ)"
+
+$(PREFIX_BIN):
+	if not exist "$(PREFIX_BIN)" mkdir "$(PREFIX_BIN)"
 
 $(PREFIX_OBJ)%.o : $(PREFIX_SRC)%.c 
 	$(CC) -c $< -o $@ -I $(PREFIX_INC)
 
 clean : 
-	del /q $(subst /,\, $(TAR)).exe, $(subst /,\, $(PREFIX_OBJ))*
+	del /q $(subst /,\, $(PREFIX_BIN)), $(subst /,\, $(PREFIX_OBJ))
