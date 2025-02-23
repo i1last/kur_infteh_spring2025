@@ -10,3 +10,13 @@
 For vsc needed:
 - https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools
 - https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools
+
+Paste to your `settings.json` for C/C++ extension:
+```json
+"C_Cpp.formatting": "vcFormat",
+"C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
+"C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
+"C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "sameLine",
+"C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "sameLine",
+"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine"
+```
