@@ -4,11 +4,15 @@
 int main() {
     init_curses();
 
-    center("Привет, мир!");
 
-    getch();
+    int ch;
+    do {
+        if (is_termresized()) resize_term(0, 0);
 
-    init_curses();
+        update_tui();
+    } while ((ch = getch()) != 27);
 
+
+    end_curses();
     return 0;
 }
