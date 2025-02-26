@@ -15,6 +15,12 @@ TAR = $(PREFIX_BIN)$(TARGET)
 
 all : $(TAR)
 
+clean : 
+	del /q $(subst /,\, $(PREFIX_BIN)), $(subst /,\, $(PREFIX_OBJ))
+
+execute : all
+	start ".\" ".\bin\kur.exe" 
+
 $(TAR) : $(OBJ) $(PREFIX_OBJ) $(PREFIX_BIN)
 	$(CC) $(OBJ) -o $(TAR) -L $(PREFIX_LIB) $(LIBS)
 
@@ -26,6 +32,3 @@ $(PREFIX_BIN):
 
 $(PREFIX_OBJ)%.o : $(PREFIX_SRC)%.c 
 	$(CC) -c $< -o $@ -I $(PREFIX_INC)
-
-clean : 
-	del /q $(subst /,\, $(PREFIX_BIN)), $(subst /,\, $(PREFIX_OBJ))
