@@ -1,14 +1,10 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-void init_curses(void);
+void make_widget(WINDOW* win, int STATE);
 
-void end_curses(void);
+void make_box(WINDOW*);
 
-void make_selecting(void);
-
-void make_window(void);
-
-void update_tui(void);
+void make_tui(int state);
 
 #endif

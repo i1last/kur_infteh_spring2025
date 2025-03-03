@@ -4,6 +4,10 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "string.h": "c",
-        "interface.h": "c"
+        "interface.h": "c",
+        "general_tui.h": "c",
+        "widgets.h": "c",
+        "global.h": "c",
+        "random": "c"
     }
 }

@@ -1,18 +1,27 @@
+#include <pthread.h>
 #include "curses.h"
 #include "interface.h"
+#include "global.h"
 
 int main() {
-    init_curses();
+    initscr();
+    refresh();
+    noecho();
+    cbreak();
+    curs_set(1);
+    keypad(stdscr, TRUE);
 
+    start_color();
+    init_pair(0, COLOR_WHITE, COLOR_BLACK);
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
 
-    int ch;
-    do {
-        if (is_termresized()) resize_term(0, 0);
+    make_tui(STATE);
 
-        update_tui();
-    } while ((ch = getch()) != 27);
+    pthread_t keys_listener_TID, term_size_listener_TID;
+    pthread_create(&keys_listener_TID, NULL, keys_listener, NULL);
+    pthread_create(&term_size_listener_TID, NULL, term_size_listener, NULL);
 
+    while (IS_RUNNING);
 
-    end_curses();
     return 0;
 }
