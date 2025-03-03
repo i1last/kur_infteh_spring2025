@@ -1,6 +1,5 @@
-#include <string.h>
 #include "widgets.h"
-#include "global.h"
+#include "service_functions.h"
 #include "curses.h"
 
 void make_widget_homepage(WINDOW* win, unsigned selected_option) {

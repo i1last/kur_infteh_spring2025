@@ -4,6 +4,7 @@
 #include "curses.h"
 #include "widgets.h"
 #include "global.h"
+#include "service_functions.h"
 
 
 void make_widget(WINDOW* win, int STATE) {
@@ -22,21 +23,7 @@ void make_widget(WINDOW* win, int STATE) {
         break;
 
     default:  // homepage
-        // int selected_option = 0;
-        // do {
-        //     make_widget_homepage(win, selected_option);
-        //     switch (getch()) {
-        //     case KEY_UP:
-        //         selected_option--;
-        //         break;
-        //     case KEY_DOWN:
-        //         selected_option++;
-        //         break;
-        //     case 27:
-        //         // end_curses();
-        //         break;
-        //     }
-        // } while (1);
+        make_widget_homepage(win, VERTICAL_SELECTED_OPTION);
         break;
     }
 

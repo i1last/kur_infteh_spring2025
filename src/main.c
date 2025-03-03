@@ -2,6 +2,7 @@
 #include "curses.h"
 #include "interface.h"
 #include "global.h"
+#include "thread_functions.h"
 
 int main() {
     initscr();
