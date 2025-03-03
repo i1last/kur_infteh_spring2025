@@ -22,7 +22,7 @@ exec : all
 	start ".\" ".\bin\kur.exe" 
 
 $(TAR) : $(OBJ) $(PREFIX_OBJ) $(PREFIX_BIN)
-	$(CC) $(OBJ) -o $(TAR) -L $(PREFIX_LIB) $(LIBS)
+	$(CC) $(OBJ) -o $(TAR) -L $(PREFIX_LIB) $(LIBS) -pthread
 
 $(PREFIX_OBJ):
 	if not exist "$(PREFIX_OBJ)" mkdir "$(PREFIX_OBJ)"
