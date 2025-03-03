@@ -45,9 +45,7 @@ void* keys_listener(void* arg) {
 }
 
 void* term_size_listener(void* arg) {
-    while (1) if (is_termresized()) {
-        make_tui(STATE);
-    }
+    while (1) if (is_termresized()) make_tui(STATE);
 
     return NULL;
 }
