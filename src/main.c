@@ -1,8 +1,7 @@
 #include <pthread.h>
 #include "curses.h"
 #include "interface.h"
-#include "global.h"
-#include "thread_functions.h"
+#include "core.h"
 
 int main() {
     initscr();

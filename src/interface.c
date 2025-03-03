@@ -3,7 +3,7 @@
 #include "interface.h"
 #include "curses.h"
 #include "widgets.h"
-#include "global.h"
+#include "core.h"
 #include "service_functions.h"
 
 
