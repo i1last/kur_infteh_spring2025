@@ -8,6 +8,7 @@
         "general_tui.h": "c",
         "widgets.h": "c",
         "global.h": "c",
-        "random": "c"
+        "random": "c",
+        "service_functions.h": "c"
     }
 }
