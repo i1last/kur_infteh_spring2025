@@ -15,25 +15,29 @@ void* keys_listener(void* arg) {
         case KEY_UP:
             VERTICAL_SELECTED_OPTION--;
             if (VERTICAL_SELECTED_OPTION == 0) VERTICAL_SELECTED_OPTION--;
+            make_tui(STATE);
             break;
         case KEY_DOWN:
             VERTICAL_SELECTED_OPTION++;
             if (VERTICAL_SELECTED_OPTION == 0) VERTICAL_SELECTED_OPTION++;
+            make_tui(STATE);
             break;
         case KEY_RIGHT:
             HORIZONTAL_SELECTED_OPTION++;
             if (HORIZONTAL_SELECTED_OPTION == 0) HORIZONTAL_SELECTED_OPTION++;
+            make_tui(STATE);
             break;
         case KEY_LEFT:
             HORIZONTAL_SELECTED_OPTION--;
             if (HORIZONTAL_SELECTED_OPTION == 0) HORIZONTAL_SELECTED_OPTION--;
+            make_tui(STATE);
             break;
         case 27:  // ESC button == 27
             IS_RUNNING = false;
             break;
         }
 
-        // make_tui(STATE);
+
     }
 
     return NULL;
