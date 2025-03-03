@@ -59,7 +59,6 @@ void make_tui(int STATE) {
 
     make_box(bg_win);
     make_widget(main_win, STATE);
-    box(main_win, 0, 0);
 
     refresh();
 
