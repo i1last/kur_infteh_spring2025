@@ -3,10 +3,10 @@
 
 #include <curses.h>
 
-void make_widget(WINDOW* win, int STATE);
+void make_widget(WINDOW* win);
 
 void make_box(WINDOW*);
 
-void make_tui(int state);
+void make_tui(void);
 
 #endif

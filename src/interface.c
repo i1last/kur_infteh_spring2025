@@ -7,23 +7,23 @@
 #include "service_functions.h"
 
 
-void make_widget(WINDOW* win, int STATE) {
+void make_widget(WINDOW* win) {
     switch (STATE) {
     case 1:  // new file
-        // make_widget_newfile(win, y_size, x_size);
+        make_widget_newfile(win);
         break;
     case 2:  // open file
-        // make_widget_openfile(win, y_size, x_size);
+        // make_widget_openfile(win);
         break;
     case 3:  // write file
-        // make_widget_writefile(win, y_size, x_size);
+        // make_widget_writefile(win);
         break;
     case 4:  // about
-        // make_widget_about(win, y_size, x_size);
+        // make_widget_about(win);
         break;
 
     default:  // homepage
-        make_widget_homepage(win, VERTICAL_SELECTED_OPTION);
+        make_widget_homepage(win);
         break;
     }
 
@@ -43,7 +43,7 @@ void make_box(WINDOW* win) {
     return;
 }
 
-void make_tui(int STATE) {
+void make_tui() {
     static WINDOW* bg_win = NULL;
     static WINDOW* main_win = NULL;
 
@@ -58,7 +58,7 @@ void make_tui(int STATE) {
     main_win = subwin(bg_win, 0, 0, 1, 1);
 
     make_box(bg_win);
-    make_widget(main_win, STATE);
+    make_widget(main_win);
 
     refresh();
 
