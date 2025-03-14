@@ -5,7 +5,6 @@
 #include "core.h"
 #include "curses.h"
 #include "interface.h"
-#include "service_widgets.h"
 
 void make_widget_homepage(WINDOW* win) {
     int selected_option = VERTICAL_SELECTED_OPTION;
@@ -56,32 +55,25 @@ void make_widget_homepage(WINDOW* win) {
 }
 
 void make_widget_newfile(WINDOW* win) {
-    if (ENTER_IS_PRESSED) {
+    if (ENTER_IS_PRESSED && BUFFER) {
         ENTER_IS_PRESSED = false;
-        // create_file()
-        // STATE: make_widget_editfile()
+        // create_file(BUFFER);
+        STATE = 2;
         return;
-    }
+    } else if (ENTER_IS_PRESSED) ENTER_IS_PRESSED = false;
 
     const int
         y_width = getmaxy(win),
         x_width = getmaxx(win);
 
-    WINDOW* box_win = subwin(win, 3, (int)(x_width * .75), y_width / 2, (int)(x_width * .125));
+    WINDOW* box_win = subwin(win, 3, MAX_BUFFER_LEN + 2, y_width / 2, x_width / 2 - MAX_BUFFER_LEN / 2);
     box(box_win, 0, 0);
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
     wrefresh(box_win);
 
-    WINDOW* input_win = derwin(box_win, 1, getmaxx(box_win) - 2, 1, 1);
-    keypad(input_win, TRUE);
+    WINDOW* input_win = derwin(box_win, getmaxy(box_win) - 2, getmaxx(box_win) - 2, 1, 1);
+    mvwaddstr(input_win, 0, 0, BUFFER);
 
-    pthread_t input_handler_TID;
-    input_handler_args args;
-    args.win = input_win;
-    args.buffer = (char*)calloc((int)(getmaxx(box_win) - 2), sizeof(char));
-    pthread_create(&input_handler_TID, NULL, input_handler, &args);
-
-    free(args.buffer);
     delwin(input_win);
     delwin(box_win);
 

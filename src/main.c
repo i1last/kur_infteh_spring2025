@@ -9,7 +9,7 @@ int main() {
     noecho();
     cbreak();
     curs_set(1);
-    timeout(50);
+    // timeout(50);
     keypad(stdscr, TRUE);
 
     start_color();
@@ -17,6 +17,8 @@ int main() {
     init_pair(1, COLOR_WHITE, COLOR_BLUE);
 
     make_tui();
+
+    pthread_mutex_init(&mutex, NULL);
 
     pthread_t keys_listener_TID, term_size_listener_TID, state_listener_TID;
     pthread_create(&keys_listener_TID, NULL, keys_listener, NULL);

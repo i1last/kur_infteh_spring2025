@@ -2,12 +2,11 @@
 #define CORE_H
 
 #include <stdbool.h>
-#include "curses.h"
+#include <pthread.h>
 
-typedef struct {
-    WINDOW* win;
-    char* buffer;
-} input_handler_args;
+#define MAX_BUFFER_LEN 64
+
+extern pthread_mutex_t mutex;
 
 extern bool IS_RUNNING;
 
@@ -18,6 +17,10 @@ extern int STATE;
 extern int VERTICAL_SELECTED_OPTION;
 
 extern int HORIZONTAL_SELECTED_OPTION;
+
+extern char BUFFER[MAX_BUFFER_LEN];
+
+extern int CURRENT_BUFFER_LEN;
 
 void* keys_listener(void* arg);
 
