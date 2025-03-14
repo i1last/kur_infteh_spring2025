@@ -14,13 +14,15 @@ unsigned len_of_string(const char* str) {
 }
 
 int create_file(void) {
-    // 8. Картотека чертежей (деталь, формат, автор, год, кодовый номер).
+    char filename[MAX_BUFFER_LEN + 4] = { 0 };
+    strcpy(filename, BUFFER);
+    strcat(filename, ".csv");
     
     WIN32_FIND_DATA find_data;
     HANDLE hFind = FindFirstFile("*", &find_data);
     
     do {
-        if (!strcmp(find_data.cFileName, BUFFER)) {
+        if (!strcmp(find_data.cFileName, filename)) {
             FindClose(hFind);
             return 1;
         }
@@ -28,8 +30,36 @@ int create_file(void) {
     
     FindClose(hFind);
     
-    FILE* file = fopen(BUFFER, "w");
+    FILE* file = fopen(filename, "w");
     fclose(file);
 
     return 0;
+}
+
+void read_csv(FILE* file, TableRow* data) {
+    char* delim = ";,";
+
+    int capacity = 20,
+        row_count = 0;
+    char buffer[1024];
+    data = malloc(capacity * sizeof(TableRow));
+
+    while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
+        if (row_count >= capacity) {
+            capacity += 20;
+            data = realloc(data, capacity * sizeof(TableRow));
+        }
+
+        char* token = strtok(buffer, delim);
+        int cell_count = 0;
+        while (cell_count != 5) {
+            data[row_count].text[cell_count] = strdup(token);
+            cell_count++;
+            token = strtok(NULL, delim);
+        }
+        row_count++;
+    }
+
+
+    return;
 }

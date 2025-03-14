@@ -8,12 +8,16 @@
 
 bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
+bool NOT_ASCII_KEY_IS_PRESSED = false;
+
 int STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
 int HORIZONTAL_SELECTED_OPTION = 0;
 int CURRENT_BUFFER_LEN = 0;
+
 char BUFFER[MAX_BUFFER_LEN] = { 0 };
 char* CURRENT_FILENAME = "";
+
 pthread_mutex_t mutex;
 
 void* keys_listener(void* arg) {
@@ -51,19 +55,18 @@ void* keys_listener(void* arg) {
             }
             break;
         default:
-            if (
-                CURRENT_BUFFER_LEN < MAX_BUFFER_LEN && 
-                (
+            if (CURRENT_BUFFER_LEN < MAX_BUFFER_LEN && (
                     48 <= pressed_char && pressed_char <= 57  ||  // 0..9
                     65 <= pressed_char && pressed_char <= 90  ||  // A..Z
                     97 <= pressed_char && pressed_char <= 122 ||  // a..z
                     pressed_char == 95                        ||  // _
                     pressed_char == 45                            // -
                 )) {
-                    BUFFER[CURRENT_BUFFER_LEN] = pressed_char;
-                    CURRENT_BUFFER_LEN++;
-                }
-                break;
+                
+                BUFFER[CURRENT_BUFFER_LEN] = pressed_char;
+                CURRENT_BUFFER_LEN++;
+            } else if (pressed_char > 128) NOT_ASCII_KEY_IS_PRESSED = true;
+            break;
         }
         pthread_mutex_lock(&mutex);
         make_tui();

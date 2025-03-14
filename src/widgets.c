@@ -64,7 +64,7 @@ void make_widget_homepage(WINDOW* win) {
 void make_widget_newfile(WINDOW* win) {
     bool file_is_exists = false;
 
-    if (ENTER_IS_PRESSED && BUFFER) {
+    if (ENTER_IS_PRESSED && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
         if (!create_file()) {
             STATE = 2;
@@ -79,8 +79,15 @@ void make_widget_newfile(WINDOW* win) {
 
     WINDOW* box_win = subwin(win, 3, MAX_BUFFER_LEN + 2, y_width / 2, x_width / 2 - MAX_BUFFER_LEN / 2);
     box(box_win, 0, 0);
+    
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
-    if (file_is_exists) mvwprintw(box_win, 2, 2, "[ ФАЙЛ УЖЕ СУЩЕСТВУЕТ ]");
+
+    if (file_is_exists) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
+    if (NOT_ASCII_KEY_IS_PRESSED) {
+        mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
+        NOT_ASCII_KEY_IS_PRESSED = false;
+    }
+    
     wrefresh(box_win);
 
     WINDOW* input_win = derwin(box_win, getmaxy(box_win) - 2, getmaxx(box_win) - 2, 1, 1);
@@ -94,7 +101,36 @@ void make_widget_newfile(WINDOW* win) {
 }
 
 void make_widget_openfile(WINDOW* win) {
+    char filename[MAX_BUFFER_LEN + 4] = { 0 };
+    strcpy(filename, CURRENT_FILENAME);
+    strcat(filename, ".csv");
 
+    FILE* file = fopen(filename, "r+");
+    
+    TableRow* data;
+    char* delim = ";,";
+    int capacity = 20,
+        row_count = 0;
+    char buffer[1024];
+    data = malloc(capacity * sizeof(TableRow));
+
+    while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
+        if (row_count >= capacity) {
+            capacity += 20;
+            data = realloc(data, capacity * sizeof(TableRow));
+        }
+
+        char* token = strtok(buffer, delim);
+        int cell_count = 0;
+        while (cell_count != MAX_COLS_IN_TABLE) {
+            data[row_count].text[cell_count] = strdup(token);
+            cell_count++;
+            token = strtok(NULL, delim);
+        }
+        row_count++;
+    }
+
+    fclose(file);
     return;
 }
 
