@@ -2,6 +2,12 @@
 #define CORE_H
 
 #include <stdbool.h>
+#include "curses.h"
+
+typedef struct {
+    WINDOW* win;
+    char* buffer;
+} input_handler_args;
 
 extern bool IS_RUNNING;
 
