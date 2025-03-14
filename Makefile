@@ -1,5 +1,6 @@
 TARGET = kur
 CC = gcc
+CFLAGS = 
 
 PREFIX_SRC = ./src/
 PREFIX_OBJ = ./obj/
@@ -21,6 +22,9 @@ clean :
 exec : all
 	start ".\" ".\bin\kur.exe" 
 
+debug : CFLAGS += -g -O0
+debug : clean all
+
 $(TAR) : $(OBJ) $(PREFIX_OBJ) $(PREFIX_BIN)
 	$(CC) $(OBJ) -o $(TAR) -L $(PREFIX_LIB) $(LIBS) -pthread
 
@@ -31,4 +35,4 @@ $(PREFIX_BIN):
 	if not exist "$(PREFIX_BIN)" mkdir "$(PREFIX_BIN)"
 
 $(PREFIX_OBJ)%.o : $(PREFIX_SRC)%.c 
-	$(CC) -c $< -o $@ -I $(PREFIX_INC)
+	$(CC) $(CFLAGS) -c $< -o $@ -I $(PREFIX_INC)
