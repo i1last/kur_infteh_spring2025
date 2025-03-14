@@ -18,9 +18,11 @@ extern int VERTICAL_SELECTED_OPTION;
 
 extern int HORIZONTAL_SELECTED_OPTION;
 
+extern int CURRENT_BUFFER_LEN;
+
 extern char BUFFER[MAX_BUFFER_LEN];
 
-extern int CURRENT_BUFFER_LEN;
+extern char* CURRENT_FILENAME;
 
 void* keys_listener(void* arg);
 

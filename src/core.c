@@ -11,8 +11,9 @@ bool ENTER_IS_PRESSED = false;
 int STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
 int HORIZONTAL_SELECTED_OPTION = 0;
-char BUFFER[MAX_BUFFER_LEN] = { 0 };
 int CURRENT_BUFFER_LEN = 0;
+char BUFFER[MAX_BUFFER_LEN] = { 0 };
+char* CURRENT_FILENAME = "";
 pthread_mutex_t mutex;
 
 void* keys_listener(void* arg) {

@@ -3,4 +3,6 @@
 
 unsigned len_of_string(const char* str);
 
+int create_file(void);
+
 #endif

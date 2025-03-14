@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <string.h>
 #include "widgets.h"
 #include "service_functions.h"
 #include "core.h"
@@ -11,7 +12,7 @@ void make_widget_homepage(WINDOW* win) {
     char* options[] = {
         "  Создать файл  ",  // STATE 1
         "  Открыть файл  ",  // STATE 2
-        "      Выход     "          // EXIT
+        "  Выход         "   // EXIT
     };
 
     unsigned options_len = sizeof(options) / sizeof(options[0]);
@@ -39,13 +40,19 @@ void make_widget_homepage(WINDOW* win) {
 
     for (int i = 0; i < options_len; i++) {
         int option_len = len_of_string(options[i]);
+        char* option = (char*)malloc(strlen(options[i]) + 2);
 
-        if (selected_option == i) wattron(win, COLOR_PAIR(1));
 
+        if (selected_option == i) {
+            wattron(win, COLOR_PAIR(1));
+            option[0] = '*';
+            strcpy(option + 1, options[i]);
+        } else strcpy(option, options[i]);
+        
         mvwaddstr(win,
             y_width / 2 - options_len + i,
             x_width / 2 - option_len / 2,
-            options[i]);
+            option);
 
         if (selected_option == i) wattroff(win, COLOR_PAIR(1));
     }
@@ -55,11 +62,15 @@ void make_widget_homepage(WINDOW* win) {
 }
 
 void make_widget_newfile(WINDOW* win) {
+    bool file_is_exists = false;
+
     if (ENTER_IS_PRESSED && BUFFER) {
         ENTER_IS_PRESSED = false;
-        // create_file(BUFFER);
-        STATE = 2;
-        return;
+        if (!create_file()) {
+            STATE = 2;
+            CURRENT_FILENAME = BUFFER;
+            return;
+        } else file_is_exists = true;
     } else if (ENTER_IS_PRESSED) ENTER_IS_PRESSED = false;
 
     const int
@@ -69,6 +80,7 @@ void make_widget_newfile(WINDOW* win) {
     WINDOW* box_win = subwin(win, 3, MAX_BUFFER_LEN + 2, y_width / 2, x_width / 2 - MAX_BUFFER_LEN / 2);
     box(box_win, 0, 0);
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
+    if (file_is_exists) mvwprintw(box_win, 2, 2, "[ ФАЙЛ УЖЕ СУЩЕСТВУЕТ ]");
     wrefresh(box_win);
 
     WINDOW* input_win = derwin(box_win, getmaxy(box_win) - 2, getmaxx(box_win) - 2, 1, 1);

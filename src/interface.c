@@ -13,7 +13,7 @@ void make_widget(WINDOW* win) {
         make_widget_newfile(win);
         break;
     case 2:  // open file
-        // make_widget_openfile(win);
+        make_widget_openfile(win);
         break;
     case 3:  // write file
         // make_widget_writefile(win);
