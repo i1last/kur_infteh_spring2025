@@ -101,34 +101,15 @@ void make_widget_newfile(WINDOW* win) {
 }
 
 void make_widget_openfile(WINDOW* win) {
+    CURRENT_FILENAME = "data";
     char filename[MAX_BUFFER_LEN + 4] = { 0 };
     strcpy(filename, CURRENT_FILENAME);
     strcat(filename, ".csv");
 
     FILE* file = fopen(filename, "r+");
     
-    TableRow* data;
-    char* delim = ";,";
-    int capacity = 20,
-        row_count = 0;
-    char buffer[1024];
-    data = malloc(capacity * sizeof(TableRow));
-
-    while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
-        if (row_count >= capacity) {
-            capacity += 20;
-            data = realloc(data, capacity * sizeof(TableRow));
-        }
-
-        char* token = strtok(buffer, delim);
-        int cell_count = 0;
-        while (cell_count != MAX_COLS_IN_TABLE) {
-            data[row_count].text[cell_count] = strdup(token);
-            cell_count++;
-            token = strtok(NULL, delim);
-        }
-        row_count++;
-    }
+    TableRow* data = read_csv(file);
+    
 
     fclose(file);
     return;

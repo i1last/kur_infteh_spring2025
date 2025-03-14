@@ -36,8 +36,10 @@ int create_file(void) {
     return 0;
 }
 
-void read_csv(FILE* file, TableRow* data) {
+TableRow* read_csv(FILE* file) {
     char* delim = ";,";
+
+    TableRow* data;
 
     int capacity = 20,
         row_count = 0;
@@ -52,7 +54,7 @@ void read_csv(FILE* file, TableRow* data) {
 
         char* token = strtok(buffer, delim);
         int cell_count = 0;
-        while (cell_count != 5) {
+        while (cell_count != MAX_COLS_IN_TABLE) {
             data[row_count].text[cell_count] = strdup(token);
             cell_count++;
             token = strtok(NULL, delim);
@@ -60,6 +62,5 @@ void read_csv(FILE* file, TableRow* data) {
         row_count++;
     }
 
-
-    return;
+    return data;
 }

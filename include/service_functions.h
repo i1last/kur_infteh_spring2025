@@ -8,6 +8,6 @@ unsigned len_of_string(const char* str);
 
 int create_file(void);
 
-void read_csv(FILE* file, TableRow* data);
+TableRow* read_csv(FILE* file);
 
 #endif
