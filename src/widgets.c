@@ -168,7 +168,6 @@ void make_widget_writefile(WINDOW* win) {
     mvwhline(header_win, 1, 2, ACS_HLINE, getmaxx(header_win) - 4);
 
     /********************************* TABLE  WIN ******************************************/
-    REGULAR_UPDATE = false;
     for (int i = 0; i < table_height; i++) {
         if (i == data.row_count) break;
 
@@ -184,11 +183,6 @@ void make_widget_writefile(WINDOW* win) {
             if ((i == smooth_selected_option(VERTICAL_SELECTED_OPTION, data.row_count)) && 
                 (j == smooth_selected_option(HORIZONTAL_SELECTED_OPTION, MAX_COLS_IN_TABLE))) {
                     wattron(table_win, A_REVERSE);
-                    
-                    if (text_len > cols_width[j]) {
-                        REGULAR_UPDATE = true;
-                        text += TICK_COUNTER % text_len;
-                    }
             }
             
             /*

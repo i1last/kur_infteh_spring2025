@@ -1,7 +1,29 @@
 #include <stdio.h>
 #include <windows.h>
+#include <string.h>
+#include <wchar.h>
+#include <locale.h>
+#include "curses.h"
 #include "service_functions.h"
 #include "core.h"
+
+unsigned smooth_selected_option(int selected_option, int condition) {
+    selected_option %= condition;
+    if (selected_option < 0) selected_option += condition;
+    return selected_option;
+}
+
+int get_start_x_cord_of_cell(int cell_index, int cols_width[MAX_COLS_IN_TABLE], int string_len, int align) {
+    int start_x_cord = 2;
+    for (int i = 0; i < cell_index; i++) {
+        start_x_cord += cols_width[i] + 3;
+    }
+
+    if (align == 1) // center
+        start_x_cord += MAX((cols_width[cell_index] - string_len) / 2, 0);
+    
+    return start_x_cord;
+}
 
 unsigned len_of_string(const char* str) {
     unsigned len = 0;
@@ -13,54 +35,65 @@ unsigned len_of_string(const char* str) {
     return len;
 }
 
-int create_file(void) {
-    char filename[MAX_BUFFER_LEN + 4] = { 0 };
+bool file_is_exists(void) {
+    char filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
     strcpy(filename, BUFFER);
-    strcat(filename, ".csv");
-    
+    strcat(filename, FILE_EXTENSION);
+
     WIN32_FIND_DATA find_data;
     HANDLE hFind = FindFirstFile("*", &find_data);
-    
+
     do {
         if (!strcmp(find_data.cFileName, filename)) {
             FindClose(hFind);
-            return 1;
+            return true;
         }
     } while (FindNextFile(hFind, &find_data));
-    
+
     FindClose(hFind);
     
-    FILE* file = fopen(filename, "w");
+    return false;
+}
+
+int create_file(void) {
+    if (file_is_exists()) return 1;
+    
+    FILE* file = fopen(CURRENT_FILENAME, "w");
     fclose(file);
 
     return 0;
 }
 
-TableRow* read_csv(FILE* file) {
+TableInfo read_csv(FILE* file) {
     char* delim = ";,";
 
-    TableRow* data;
+    TableRow* rows;
 
     int capacity = 20,
         row_count = 0;
     char buffer[1024];
-    data = malloc(capacity * sizeof(TableRow));
+    rows = malloc(capacity * sizeof(TableRow));
 
     while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
         if (row_count >= capacity) {
             capacity += 20;
-            data = realloc(data, capacity * sizeof(TableRow));
+            rows = realloc(rows, capacity * sizeof(TableRow));
         }
 
         char* token = strtok(buffer, delim);
         int cell_count = 0;
         while (cell_count != MAX_COLS_IN_TABLE) {
-            data[row_count].text[cell_count] = strdup(token);
+            rows[row_count].text[cell_count] = strdup(token);
             cell_count++;
             token = strtok(NULL, delim);
         }
         row_count++;
     }
+
+    TableInfo data = {
+        .rows = rows,
+        .row_count = row_count
+    };
 
     return data;
 }

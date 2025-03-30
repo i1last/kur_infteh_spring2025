@@ -117,23 +117,3 @@ void* state_listener(void* arg) {
 
     return NULL;
 }
-
-void* regular_update_listener(void* arg) {
-    static struct timespec ts;
-
-    while (1) {
-        if (REGULAR_UPDATE) {
-            pthread_mutex_lock(&mutex);
-            make_tui();
-            pthread_mutex_unlock(&mutex);
-
-            TICK_COUNTER++;
-
-            ts.tv_sec = 0;
-            ts.tv_nsec = 100 * 1000000L; // 200 мс = 200 000 000 нс
-            nanosleep(&ts, NULL);
-        }
-    }
-
-    return NULL;
-}
