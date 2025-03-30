@@ -60,7 +60,7 @@ void make_widget_homepage(WINDOW* win) {
             x_width / 2 - option_len / 2,
             option);
 
-        if (selected_option == i) wattroff(win, COLOR_PAIR(1));  // WIP Могу убрать IF?
+        wattroff(win, COLOR_PAIR(1));
     }
     wrefresh(win);
 
@@ -137,7 +137,6 @@ void make_widget_writefile(WINDOW* win) {
     TableInfo data = read_csv(file);
 
     WINDOW* header_win = derwin(win, 2, getmaxx(win), 1, 0);
-    // WINDOW* table_win  = derwin(win, getmaxy(win) - 4, getmaxx(win) - 2, 3, 1);
     WINDOW* table_win  = derwin(win, getmaxy(win) - 4, getmaxx(win), 3, 0);
     WINDOW* scroll_win = subwin(win, getmaxy(win) - 4, 1, 4, getmaxx(win));
     
@@ -199,20 +198,13 @@ void make_widget_writefile(WINDOW* win) {
             
             if (j < (MAX_COLS_IN_TABLE - 1))
                 mvwvline(table_win, 0, get_start_x_cord_of_cell(j + 1, cols_width, 0, 0) - 2, ACS_VLINE, getmaxy(table_win));
-            // if ((text_len > cols_width - 1) &&
-            //     (i == smooth_selected_option(VERTICAL_SELECTED_OPTION, data.row_count)) && 
-            //     (j == smooth_selected_option(HORIZONTAL_SELECTED_OPTION, MAX_COLS_IN_TABLE))) {
-            //     offset = offset_counter % (text_len + 3);
-            // }
-
-            // mvwaddnstr(table_win, i - TABLE_STATE.FIRST_ROW, start_x_cord, data.rows[i].text[j] + offset, cols_width - 1);
-            // if (text_len - offset < cols_width - 1) {
-            //     mvwaddnstr(table_win, i - TABLE_STATE.FIRST_ROW, start_x_cord + (text_len - offset), data.rows[i].text[j], cols_width - 1 - (text_len - offset));
-            // }
 
             wattroff(table_win, A_REVERSE);
         }
     }
+
+    /********************************* SCROLL WIN ******************************************/
+
 
     wrefresh(table_win);
         
@@ -224,52 +216,7 @@ void make_widget_writefile(WINDOW* win) {
     
     fclose(file);
     return;
-/****************************************************************************************************************************************************** */
-        
-    // werase(table_win);
-
-    // int col_width = (table_width - 1) / COLS;
-    // for(int i = 0; i < table_height; i++) {
-    //     int data_row = state->start_row + i;
-    //     if(data_row >= MAX_ROWS) break;
-        
-    //     for(int j = 0; j < COLS; j++) {
-    //         int x = j * col_width;
-            
-    //         if(i == state->selected_row - state->start_row && j == state->selected_col) {
-    //             wattron(table_win, A_REVERSE);
-    //         }
-            
-    //         char *text = data[data_row].text[j];
-    //         int len = strlen(text);
-    //         int offset = 0;
-            
-    //         if(len > col_width - 1 && 
-    //            data_row == state->selected_row && 
-    //            j == state->selected_col) 
-    //         {
-    //             offset = state->running_text_pos % (len + 3);
-    //         }
-            
-    //         mvwaddnstr(table_win, i, x + 1, text + offset, col_width - 1);
-    //         if(len - offset < col_width - 1) {
-    //             mvwaddnstr(table_win, i, x + 1 + (len - offset), 
-    //                       text, col_width - 1 - (len - offset));
-    //         }
-            
-    //         wattroff(table_win, A_REVERSE);
-    //     }
-    // }
     
-    // for(int i = 0; i < COLS + 1; i++) {
-    //     mvwvline(table_win, 0, i * col_width, ACS_VLINE, table_height);
-    // }
-    // whline(table_win, ACS_HLINE, table_width);
-    
-    // wnoutrefresh(table_win);
-    
-/****************************************************************************************************************************************************** */
-    /********************************* SCROLL WIN ******************************************/
 
 
 }
