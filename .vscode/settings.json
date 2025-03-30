@@ -10,6 +10,7 @@
         "global.h": "c",
         "random": "c",
         "service_functions.h": "c",
-        "service_widgets.h": "c"
+        "service_widgets.h": "c",
+        "math.h": "c"
     }
 }

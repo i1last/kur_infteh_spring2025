@@ -32,7 +32,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "mingw32-make",
+            "command": "mingw32-make exec",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -43,7 +43,7 @@
             "type": "shell",
             "command": "mingw32-make debug",
             "group": {
-                "kind": "build",
+                "kind": "test",
                 "isDefault": true
             }
         }
