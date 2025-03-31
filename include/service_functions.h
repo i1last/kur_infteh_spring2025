@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include "core.h"
 
+int convert_strlen_to_len_of_string(int condition, char** text);
+
 WINDOW* create_box_input_window(WINDOW** win);
 
 void create_input_menu(WINDOW** box_win);

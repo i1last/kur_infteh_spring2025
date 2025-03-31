@@ -7,6 +7,20 @@
 #include "service_functions.h"
 #include "core.h"
 
+/*
+mvwaddnstr использует для счетчика символов в строке strlen, который некорректно считает количество
+символов в строке с кириллицей (не умеет работать с utf8). Именно поэтому используется переменная
+condition, которая реализует следующее уравнение:
+len_of_string(text) = condition
+strlen(text) = x,
+где len_of_string(text) корректно считает количество символов в строке (собственная функция).
+Решаем уравнения накрест и получаем результат. 
+*/
+int convert_strlen_to_len_of_string(int condition, char** text) {
+    int text_len = len_of_string(*text);
+    return condition * strlen(*text) / text_len;
+}
+
 WINDOW* create_box_input_window(WINDOW** win) {
     WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2, getmaxy(*win) / 2, getmaxx(*win) / 2 - MAX_BUFFER_LEN / 2);
     box(box_win, 0, 0);

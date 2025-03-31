@@ -198,16 +198,7 @@ void make_widget_writefile(WINDOW* win) {
             // if current cell is selected option
             if ((i == v_selected) && (j == h_selected)) wattron(table_win, A_REVERSE);
             
-            /*
-            mvwaddnstr использует для счетчика символов в строке strlen, который некорректно считает количество
-            символов в строке с кириллицей (не умеет работать с utf8). Именно поэтому используется переменная
-            condition, которая реализует следующее уравнение:
-                            len_of_string(text) = cols_width[j]
-                            strlen(text) = x,
-            где len_of_string(text) корректно считает количество символов в строке (собственная функция).
-            Решаем уравнения накрест и получаем результат. 
-            */
-            int condition = cols_width[j] * strlen(text) / text_len;
+            int condition = convert_strlen_to_len_of_string(cols_width[j], &text);
             mvwaddnstr(table_win, i, start_x_cord, text, condition);
             
             wattroff(table_win, A_REVERSE);
