@@ -32,8 +32,6 @@ extern int CURRENT_BUFFER_LEN;
 
 extern int CURSOR_POS;
 
-extern unsigned TICK_COUNTER;
-
 extern char BUFFER[MAX_BUFFER_LEN];
 
 extern char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
@@ -48,8 +46,6 @@ typedef struct {
     TableRow* rows;
     int row_count;
 } TableInfo;
-
-void clear_buffer(void);
 
 void* keys_listener(void* arg);
 

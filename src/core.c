@@ -18,18 +18,10 @@ int HORIZONTAL_SELECTED_OPTION = 0;
 int CURRENT_BUFFER_LEN = 0;
 int CURSOR_POS = 0;
 
-unsigned TICK_COUNTER = 0;
-
 char BUFFER[MAX_BUFFER_LEN] = { 0 };
 char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
 pthread_mutex_t mutex;
-
-void clear_buffer(void) {
-    memset(BUFFER, '\0', sizeof(BUFFER));
-    CURRENT_BUFFER_LEN = 0;
-    CURSOR_POS = 0;
-}
 
 void* keys_listener(void* arg) {
     int pressed_char = 0;
@@ -41,20 +33,16 @@ void* keys_listener(void* arg) {
             else IS_RUNNING = false;
             break;
         case KEY_UP:
-            TICK_COUNTER = 0;
             VERTICAL_SELECTED_OPTION--;
             break;
         case KEY_DOWN:
-            TICK_COUNTER = 0;
             VERTICAL_SELECTED_OPTION++;
             break;
         case KEY_RIGHT:
-            TICK_COUNTER = 0;
             HORIZONTAL_SELECTED_OPTION++;
             CURSOR_POS = MIN(MAX_BUFFER_LEN, CURSOR_POS + 1);
             break;
         case KEY_LEFT:
-            TICK_COUNTER = 0;
             HORIZONTAL_SELECTED_OPTION--;
             CURSOR_POS = MAX(1, CURSOR_POS - 1);
             break;
@@ -121,10 +109,14 @@ void* state_listener(void* arg) {
 
     while (1) if (STATE != prev_state) {
         prev_state = STATE;
-        clear_buffer();
+        
+        memset(BUFFER, '\0', sizeof(BUFFER));
+        CURRENT_BUFFER_LEN = 0;
+        CURSOR_POS = 0;
+
         VERTICAL_SELECTED_OPTION = 0;
         HORIZONTAL_SELECTED_OPTION = 0;
-        TICK_COUNTER = 0;
+        
         ENTER_IS_PRESSED = false;
         REGULAR_UPDATE = false;
         
