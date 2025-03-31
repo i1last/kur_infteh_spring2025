@@ -156,33 +156,55 @@ void make_widget_writefile(WINDOW* win) {
         (table_width - reserved) * 5 / 100,
     };
     
+    int total_rows = data.row_count;
+    int visible_rows = table_height;
+    
     for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
         int start_x_cord = get_start_x_cord_of_cell(i, cols_width, len_of_string(header[i]), table_options[i]);
 
         mvwaddstr(header_win, 0, start_x_cord, header[i]);
 
-        if (i < (MAX_COLS_IN_TABLE - 1)) mvwvline(header_win, 0, get_start_x_cord_of_cell(i + 1, cols_width, 0, 0) - 2, ACS_VLINE, getmaxy(header_win));
+        if (i < (MAX_COLS_IN_TABLE - 1)) 
+            mvwvline(header_win, 0, get_start_x_cord_of_cell(i + 1, cols_width, 0, 0) - 2, ACS_VLINE, getmaxy(header_win));
     }
     
     mvwhline(header_win, 1, 2, ACS_HLINE, getmaxx(header_win) - 4);
 
+    /********************************* SCROLL LOGIC ******************************************/
+    int absolute_v_selected = smooth_selected_option(VERTICAL_SELECTED_OPTION, total_rows);    
+    static unsigned first_row = 0;
+
+    // Основная логика прокрутки таблицы
+    if (absolute_v_selected >= first_row + visible_rows) {
+        first_row = absolute_v_selected - visible_rows + 1;
+    } else if (absolute_v_selected < first_row) {
+        first_row = absolute_v_selected;
+    }
+
+    // Защита от изменения размера окна
+    if (first_row + visible_rows > total_rows) {
+        first_row = total_rows - visible_rows;
+    }
+    if (first_row < 0 || total_rows < visible_rows) first_row = 0;
+    
+    int v_selected = absolute_v_selected - first_row;
+    int h_selected = smooth_selected_option(HORIZONTAL_SELECTED_OPTION, MAX_COLS_IN_TABLE);
+
     /********************************* TABLE  WIN ******************************************/
     for (int i = 0; i < table_height; i++) {
-        if (i == data.row_count) break;
+        if (i >= total_rows) break;
 
         for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
-            unsigned text_row_index = i + TABLE_STATE.FIRST_ROW;
+            unsigned text_row_index = i + first_row;
             unsigned text_col_index = j;
+
             char* text = data.rows[text_row_index].text[text_col_index];
             unsigned text_len = len_of_string(text);
+            
             int start_x_cord = get_start_x_cord_of_cell(j, cols_width, text_len, table_options[j]);
-            unsigned offset = 0;
 
             // if current cell is selected option
-            if ((i == smooth_selected_option(VERTICAL_SELECTED_OPTION, data.row_count)) && 
-                (j == smooth_selected_option(HORIZONTAL_SELECTED_OPTION, MAX_COLS_IN_TABLE))) {
-                    wattron(table_win, A_REVERSE);
-            }
+            if ((i == v_selected) && (j == h_selected)) wattron(table_win, A_REVERSE);
             
             /*
             mvwaddnstr использует для счетчика символов в строке strlen, который некорректно считает количество
@@ -196,29 +218,47 @@ void make_widget_writefile(WINDOW* win) {
             int condition = cols_width[j] * strlen(text) / text_len;
             mvwaddnstr(table_win, i, start_x_cord, text, condition);
             
-            if (j < (MAX_COLS_IN_TABLE - 1))
-                mvwvline(table_win, 0, get_start_x_cord_of_cell(j + 1, cols_width, 0, 0) - 2, ACS_VLINE, getmaxy(table_win));
-
             wattroff(table_win, A_REVERSE);
+
+            if (j < (MAX_COLS_IN_TABLE - 1))
+                mvwvline(
+                    table_win, 
+                    0, 
+                    get_start_x_cord_of_cell(j + 1, cols_width, 0, 0) - 2, 
+                    ACS_VLINE, 
+                    MIN(visible_rows, total_rows)
+                );
         }
     }
 
     /********************************* SCROLL WIN ******************************************/
+    int scroll_height = table_height;
+    if (total_rows > table_height) {
+        int scrollbar_size = (total_rows > visible_rows) ? (visible_rows * scroll_height / total_rows) : scroll_height;
+        if (scrollbar_size < 1) scrollbar_size = 1;
 
+        int scrollbar_pos = (first_row * (scroll_height - scrollbar_size)) / (total_rows - visible_rows);
+        if (scrollbar_pos < 0) scrollbar_pos = 0;
+        if (scrollbar_pos + scrollbar_size > scroll_height) scrollbar_pos = scroll_height - scrollbar_size;
 
+        for (int i = 0; i < scroll_height; i++) {
+            if (i >= scrollbar_pos && i < scrollbar_pos + scrollbar_size) {
+                mvwaddch(scroll_win, i, 0, ACS_VLINE | A_REVERSE); // Ползунок
+            } else {
+                mvwaddch(scroll_win, i, 0, ACS_VLINE); // Фон полосы прокрутки
+            }
+        }
+    }
+        
     wrefresh(table_win);
-        
-        
+    wrefresh(scroll_win);
+    
     delwin(table_win);
     delwin(scroll_win);
-
-    wrefresh(win);
     
     fclose(file);
+
     return;
-    
-
-
 }
 
 void make_widget_about(WINDOW* win) {
