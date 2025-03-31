@@ -22,13 +22,6 @@ unsigned TICK_COUNTER = 0;
 char BUFFER[MAX_BUFFER_LEN] = { 0 };
 char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
-struct TableState TABLE_STATE = {
-    .FIRST_ROW = 0,
-    .SCROLL_OFFSET = 0,
-    .RUNNING_TEXT_POS = 0,
-    .LAST_UPDATE = 0
-};
-
 pthread_mutex_t mutex;
 
 void* keys_listener(void* arg) {

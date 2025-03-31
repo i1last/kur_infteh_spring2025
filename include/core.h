@@ -38,13 +38,6 @@ extern char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 
 extern struct TableState TABLE_STATE;
 
-struct TableState {
-    int FIRST_ROW;
-    int SCROLL_OFFSET;
-    int RUNNING_TEXT_POS;
-    time_t LAST_UPDATE;
-};
-
 typedef struct {
     char* text[MAX_COLS_IN_TABLE];
 } TableRow;
