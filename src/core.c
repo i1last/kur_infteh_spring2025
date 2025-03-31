@@ -16,6 +16,7 @@ int STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
 int HORIZONTAL_SELECTED_OPTION = 0;
 int CURRENT_BUFFER_LEN = 0;
+int CURSOR_POS = 0;
 
 unsigned TICK_COUNTER = 0;
 
@@ -44,18 +45,29 @@ void* keys_listener(void* arg) {
         case KEY_RIGHT:
             TICK_COUNTER = 0;
             HORIZONTAL_SELECTED_OPTION++;
+            CURSOR_POS = MIN(MAX_BUFFER_LEN, CURSOR_POS + 1);
             break;
         case KEY_LEFT:
             TICK_COUNTER = 0;
             HORIZONTAL_SELECTED_OPTION--;
+            CURSOR_POS = MAX(1, CURSOR_POS - 1);
             break;
         case 10: // ENTER button == 10
             ENTER_IS_PRESSED = true;
             break;
         case 8:  // BACKSPACE
             if (CURRENT_BUFFER_LEN > 0) {
+                CURSOR_POS--;
+                
+                char temp_buffer[MAX_BUFFER_LEN] = { 0 };
+                for (int i = 0; i < CURRENT_BUFFER_LEN; ++i) {
+                    if (i < CURSOR_POS) temp_buffer[i] = BUFFER[i];
+                    else if (i == CURSOR_POS) continue;
+                    else temp_buffer[i - 1] = BUFFER[i];
+                    
+                }
+                strcpy(BUFFER, temp_buffer);
                 CURRENT_BUFFER_LEN--;
-                BUFFER[CURRENT_BUFFER_LEN] = '\0';
             }
             break;
         default:
@@ -66,9 +78,17 @@ void* keys_listener(void* arg) {
                     pressed_char == 95                        ||  // _
                     pressed_char == 45                            // -
                 )) {
-                
-                BUFFER[CURRENT_BUFFER_LEN] = pressed_char;
                 CURRENT_BUFFER_LEN++;
+                
+                char temp_buffer[MAX_BUFFER_LEN] = { 0 };
+                for (int i = 0; i < CURRENT_BUFFER_LEN; ++i) {
+                    if (i < CURSOR_POS) temp_buffer[i] = BUFFER[i];
+                    else if (i == CURSOR_POS) temp_buffer[i] = pressed_char;
+                    else temp_buffer[i] = BUFFER[i - 1];
+                }
+                strcpy(BUFFER, temp_buffer);
+
+                CURSOR_POS++;
             } else if (pressed_char > 128) NOT_ASCII_KEY_IS_PRESSED = true;
             break;
         }

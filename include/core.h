@@ -30,6 +30,8 @@ extern int HORIZONTAL_SELECTED_OPTION;
 
 extern int CURRENT_BUFFER_LEN;
 
+extern int CURSOR_POS;
+
 extern unsigned TICK_COUNTER;
 
 extern char BUFFER[MAX_BUFFER_LEN];

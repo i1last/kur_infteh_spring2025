@@ -22,7 +22,8 @@ int convert_strlen_to_strlen_utf8(int condition, char** text) {
 }
 
 WINDOW* create_box_input_window(WINDOW** win) {
-    WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2, getmaxy(*win) / 2, getmaxx(*win) / 2 - MAX_BUFFER_LEN / 2);
+    WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2 + 1, getmaxy(*win) / 2, getmaxx(*win) / 2 - MAX_BUFFER_LEN / 2);
+    //                       для рамок слева и справа -^   ^- для отображения курсора
     box(box_win, 0, 0);
 
     return box_win;
@@ -30,9 +31,22 @@ WINDOW* create_box_input_window(WINDOW** win) {
 
 void create_input_menu(WINDOW** box_win) {
     WINDOW* input_win = derwin(*box_win, getmaxy(*box_win) - 2, getmaxx(*box_win) - 2, 1, 1);
-    mvwaddstr(input_win, 0, 0, BUFFER);
+    
+    for (int i = 0; i < CURRENT_BUFFER_LEN; i++) {
+        if (i == CURSOR_POS) wattron(input_win, A_REVERSE);
+        waddch(input_win, BUFFER[i]);
+        wattroff(input_win, A_REVERSE);
+    }
+
+    // Если курсор стоит в конце, выделяем пробел
+    if (CURSOR_POS == CURRENT_BUFFER_LEN) {
+        wattron(input_win, A_REVERSE);
+        waddch(input_win, ' ');
+        wattroff(input_win, A_REVERSE);
+    }
+
+    wrefresh(input_win);
     delwin(input_win);
-    return;
 }
 
 unsigned smooth_selected_option(int selected_option, int condition) {
