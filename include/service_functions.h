@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "core.h"
 
-int convert_strlen_to_len_of_string(int condition, char** text);
+int convert_strlen_to_strlen_utf8(int condition, char** text);
 
 WINDOW* create_box_input_window(WINDOW** win);
 
@@ -15,7 +15,7 @@ unsigned smooth_selected_option(int selected_option, int condition);
 
 int get_start_x_cord_of_cell(int cell_index, int cols_width[MAX_COLS_IN_TABLE], int string_len, int align);
 
-unsigned len_of_string(const char* str);
+unsigned strlen_utf8(const char* str);
 
 bool file_is_exists(void);
 

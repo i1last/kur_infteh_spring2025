@@ -42,7 +42,7 @@ void make_widget_homepage(WINDOW* win) {
         x_width = getmaxx(win);
 
     for (int i = 0; i < options_len; i++) {
-        int option_len = len_of_string(options[i]);
+        int option_len = strlen_utf8(options[i]);
         char* option = (char*)malloc(strlen(options[i]) + 2);
 
 
@@ -152,7 +152,7 @@ void make_widget_writefile(WINDOW* win) {
     int visible_rows = table_height;
     
     for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-        int start_x_cord = get_start_x_cord_of_cell(i, cols_width, len_of_string(header[i]), table_options[i]);
+        int start_x_cord = get_start_x_cord_of_cell(i, cols_width, strlen_utf8(header[i]), table_options[i]);
 
         mvwaddstr(header_win, 0, start_x_cord, header[i]);
 
@@ -191,14 +191,14 @@ void make_widget_writefile(WINDOW* win) {
             unsigned text_col_index = j;
 
             char* text = data.rows[text_row_index].text[text_col_index];
-            unsigned text_len = len_of_string(text);
+            unsigned text_len = strlen_utf8(text);
             
             int start_x_cord = get_start_x_cord_of_cell(j, cols_width, text_len, table_options[j]);
 
             // if current cell is selected option
             if ((i == v_selected) && (j == h_selected)) wattron(table_win, A_REVERSE);
             
-            int condition = convert_strlen_to_len_of_string(cols_width[j], &text);
+            int condition = convert_strlen_to_strlen_utf8(cols_width[j], &text);
             mvwaddnstr(table_win, i, start_x_cord, text, condition);
             
             wattroff(table_win, A_REVERSE);

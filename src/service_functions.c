@@ -11,13 +11,13 @@
 mvwaddnstr использует для счетчика символов в строке strlen, который некорректно считает количество
 символов в строке с кириллицей (не умеет работать с utf8). Именно поэтому используется переменная
 condition, которая реализует следующее уравнение:
-len_of_string(text) = condition
+strlen_utf8(text) = condition
 strlen(text) = x,
-где len_of_string(text) корректно считает количество символов в строке (собственная функция).
+где strlen_utf8(text) корректно считает количество символов в строке (собственная функция).
 Решаем уравнения накрест и получаем результат. 
 */
-int convert_strlen_to_len_of_string(int condition, char** text) {
-    int text_len = len_of_string(*text);
+int convert_strlen_to_strlen_utf8(int condition, char** text) {
+    int text_len = strlen_utf8(*text);
     return condition * strlen(*text) / text_len;
 }
 
@@ -53,7 +53,7 @@ int get_start_x_cord_of_cell(int cell_index, int cols_width[MAX_COLS_IN_TABLE], 
     return start_x_cord;
 }
 
-unsigned len_of_string(const char* str) {
+unsigned strlen_utf8(const char* str) {
     unsigned len = 0;
     while (*str) {
         // Проверяем, является ли текущий байт началом символа UTF-8
