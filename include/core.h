@@ -20,8 +20,6 @@ extern bool ENTER_IS_PRESSED;
 
 extern bool NOT_ASCII_KEY_IS_PRESSED;
 
-extern bool REGULAR_UPDATE;
-
 extern int STATE;
 
 extern int VERTICAL_SELECTED_OPTION;

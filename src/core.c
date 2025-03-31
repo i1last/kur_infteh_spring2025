@@ -10,7 +10,6 @@
 bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
 bool NOT_ASCII_KEY_IS_PRESSED = false;
-bool REGULAR_UPDATE = false;
 
 int STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
@@ -118,7 +117,6 @@ void* state_listener(void* arg) {
         HORIZONTAL_SELECTED_OPTION = 0;
         
         ENTER_IS_PRESSED = false;
-        REGULAR_UPDATE = false;
         
         pthread_mutex_lock(&mutex);
         make_tui();
