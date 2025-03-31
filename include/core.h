@@ -49,6 +49,8 @@ typedef struct {
     int row_count;
 } TableInfo;
 
+void clear_buffer(void);
+
 void* keys_listener(void* arg);
 
 void* term_size_listener(void* arg);

@@ -25,6 +25,12 @@ char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
 pthread_mutex_t mutex;
 
+void clear_buffer(void) {
+    memset(BUFFER, '\0', sizeof(BUFFER));
+    CURRENT_BUFFER_LEN = 0;
+    CURSOR_POS = 0;
+}
+
 void* keys_listener(void* arg) {
     int pressed_char = 0;
 
@@ -115,8 +121,7 @@ void* state_listener(void* arg) {
 
     while (1) if (STATE != prev_state) {
         prev_state = STATE;
-        memset(BUFFER, '\0', sizeof(BUFFER));
-        CURRENT_BUFFER_LEN = 0;
+        clear_buffer();
         VERTICAL_SELECTED_OPTION = 0;
         HORIZONTAL_SELECTED_OPTION = 0;
         TICK_COUNTER = 0;
