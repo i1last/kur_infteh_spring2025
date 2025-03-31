@@ -39,7 +39,6 @@ void make_box(WINDOW* win) {
     char footer[] = "[ ESC | Enter | ←→↑↓ ]";
     mvwaddstr(win, getmaxy(win) - 1, 2, footer);
 
-    wrefresh(win);
     return;
 }
 
@@ -47,8 +46,6 @@ void make_tui() {
     static WINDOW* bg_win = NULL;
     static WINDOW* main_win = NULL;
 
-    werase(bg_win);
-    wrefresh(bg_win);
     delwin(bg_win);
     delwin(main_win);
 
@@ -59,8 +56,9 @@ void make_tui() {
 
     make_box(bg_win);
     make_widget(main_win);
-
-    refresh();
+    
+    wrefresh(bg_win);
+    wrefresh(main_win);
 
     return;
 }
