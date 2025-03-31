@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include "core.h"
 
+WINDOW* create_box_input_window(WINDOW** win);
+
+void create_input_menu(WINDOW** box_win);
+
 unsigned smooth_selected_option(int selected_option, int condition);
 
 int get_start_x_cord_of_cell(int cell_index, int cols_width[MAX_COLS_IN_TABLE], int string_len, int align);

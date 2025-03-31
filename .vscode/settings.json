@@ -12,6 +12,7 @@
         "service_functions.h": "c",
         "service_widgets.h": "c",
         "math.h": "c",
-        "core.h": "c"
+        "core.h": "c",
+        "stdbool.h": "c"
     }
 }

@@ -7,6 +7,20 @@
 #include "service_functions.h"
 #include "core.h"
 
+WINDOW* create_box_input_window(WINDOW** win) {
+    WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2, getmaxy(*win) / 2, getmaxx(*win) / 2 - MAX_BUFFER_LEN / 2);
+    box(box_win, 0, 0);
+
+    return box_win;
+}
+
+void create_input_menu(WINDOW** box_win) {
+    WINDOW* input_win = derwin(*box_win, getmaxy(*box_win) - 2, getmaxx(*box_win) - 2, 1, 1);
+    mvwaddstr(input_win, 0, 0, BUFFER);
+    delwin(input_win);
+    return;
+}
+
 unsigned smooth_selected_option(int selected_option, int condition) {
     selected_option %= condition;
     if (selected_option < 0) selected_option += condition;

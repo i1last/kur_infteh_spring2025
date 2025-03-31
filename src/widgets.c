@@ -77,8 +77,7 @@ void make_widget_newfile(WINDOW* win) {
         return;
     } else ENTER_IS_PRESSED = false;
 
-    WINDOW* box_win = subwin(win, 3, MAX_BUFFER_LEN + 2, getmaxy(win) / 2, getmaxx(win) / 2 - MAX_BUFFER_LEN / 2);
-    box(box_win, 0, 0);
+    WINDOW* box_win = create_box_input_window(&win);
     
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
 
@@ -88,12 +87,9 @@ void make_widget_newfile(WINDOW* win) {
         NOT_ASCII_KEY_IS_PRESSED = false;
     }
     
+    create_input_menu(&box_win);
+    
     wrefresh(box_win);
-
-    WINDOW* input_win = derwin(box_win, getmaxy(box_win) - 2, getmaxx(box_win) - 2, 1, 1);
-    mvwaddstr(input_win, 0, 0, BUFFER);
-
-    delwin(input_win);
     delwin(box_win);
 
     wrefresh(win);
@@ -109,8 +105,7 @@ void make_widget_openfile(WINDOW* win) {
         return;
     } else ENTER_IS_PRESSED = false;
 
-    WINDOW* box_win = subwin(win, 3, MAX_BUFFER_LEN + 2, getmaxy(win) / 2, getmaxx(win) / 2 - MAX_BUFFER_LEN / 2);
-    box(box_win, 0, 0);
+    WINDOW* box_win = create_box_input_window(&win);
     
     mvwprintw(box_win, 0, 2, "[ Введите имя файла ]");
 
@@ -120,12 +115,9 @@ void make_widget_openfile(WINDOW* win) {
         NOT_ASCII_KEY_IS_PRESSED = false;
     }
     
+    create_input_menu(&box_win);
+    
     wrefresh(box_win);
-
-    WINDOW* input_win = derwin(box_win, getmaxy(box_win) - 2, getmaxx(box_win) - 2, 1, 1);
-    mvwaddstr(input_win, 0, 0, BUFFER);
-
-    delwin(input_win);
     delwin(box_win);
 
     wrefresh(win);
