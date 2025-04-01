@@ -70,9 +70,12 @@ void make_widget_homepage(WINDOW* win) {
 void make_widget_newfile(WINDOW* win) {
     if (ENTER_IS_PRESSED && (!file_is_exists()) && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
+        
         strcpy(CURRENT_FILENAME, BUFFER);
         strcat(CURRENT_FILENAME, FILE_EXTENSION);
+        
         create_file();
+        
         STATE = 3;
         return;
     } else ENTER_IS_PRESSED = false;
@@ -148,7 +151,7 @@ void make_widget_writefile(WINDOW* win) {
         (table_width - reserved) * 5 / 100,
     };
     
-    int total_rows = data.row_count;
+    int total_rows = MAX(data.row_count, 1);
     int visible_rows = table_height;
     
     for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
@@ -191,6 +194,7 @@ void make_widget_writefile(WINDOW* win) {
             unsigned text_col_index = j;
 
             char* text = data.rows[text_row_index].text[text_col_index];
+            if (text == NULL) text = " ";
             unsigned text_len = strlen_utf8(text);
             
             int start_x_cord = get_start_x_cord_of_cell(j, cols_width, text_len, table_options[j]);
@@ -232,6 +236,26 @@ void make_widget_writefile(WINDOW* win) {
             }
         }
     }
+
+    /********************************* EDIT MENU ******************************************/
+    // if (ENTER_IS_PRESSED) {
+    //     ENTER_IS_PRESSED = false;
+        
+    //     WINDOW* box_win = create_box_input_window(&win);
+        
+    //     if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
+    //     if (NOT_ASCII_KEY_IS_PRESSED) {
+    //         mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
+    //         NOT_ASCII_KEY_IS_PRESSED = false;
+    //     }
+        
+    //     create_input_menu(&box_win);
+        
+    //     wrefresh(box_win);
+    //     delwin(box_win);
+        
+    //     return;
+    // }
         
     wrefresh(table_win);
     wrefresh(scroll_win);

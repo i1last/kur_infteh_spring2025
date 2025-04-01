@@ -18,7 +18,8 @@ strlen(text) = x,
 */
 int convert_strlen_to_strlen_utf8(int condition, char** text) {
     int text_len = strlen_utf8(*text);
-    return condition * strlen(*text) / text_len;
+    if (text_len == 0) return 0;
+    else return condition * strlen(*text) / text_len;
 }
 
 WINDOW* create_box_input_window(WINDOW** win) {
@@ -69,7 +70,7 @@ int get_start_x_cord_of_cell(int cell_index, int cols_width[MAX_COLS_IN_TABLE], 
 
 unsigned strlen_utf8(const char* str) {
     unsigned len = 0;
-    while (*str) {
+    if (str != NULL) while (*str) {
         // Проверяем, является ли текущий байт началом символа UTF-8
         if ((*str & 0xC0) != 0x80) len++;
         str++;
@@ -109,12 +110,12 @@ int create_file(void) {
 TableInfo read_csv(FILE* file) {
     char* delim = ";,";
 
-    TableRow* rows;
-
     int capacity = 20,
         row_count = 0;
     char buffer[1024];
-    rows = malloc(capacity * sizeof(TableRow));
+
+    TableRow* rows = calloc(capacity, sizeof(TableRow));
+    // rows = malloc(capacity * sizeof(TableRow));
 
     while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
         if (row_count >= capacity) {
