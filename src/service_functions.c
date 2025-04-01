@@ -115,7 +115,6 @@ TableInfo read_csv(FILE* file) {
     char buffer[1024];
 
     TableRow* rows = calloc(capacity, sizeof(TableRow));
-    // rows = malloc(capacity * sizeof(TableRow));
 
     while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
         if (row_count >= capacity) {
