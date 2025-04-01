@@ -16,6 +16,8 @@
         "stdbool.h": "c",
         "pthread.h": "c",
         "time.h": "c",
-        "locale.h": "c"
+        "locale.h": "c",
+        "wchar.h": "c",
+        "windows.h": "c"
     }
 }

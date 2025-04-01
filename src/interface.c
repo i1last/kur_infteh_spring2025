@@ -50,12 +50,17 @@ void make_tui() {
     delwin(main_win);
 
     resize_term(0, 0);
-
+    
     bg_win = newwin(LINES, COLS, 0, 0);
     main_win = subwin(bg_win, 0, 0, 1, 1);
-
-    make_box(bg_win);
-    make_widget(main_win);
+    
+    if (COLS >= MIN_TERM_COLS && LINES >= MIN_TERM_ROWS){
+        make_box(bg_win);
+        make_widget(main_win);
+    } else {
+        char* attention = "Размер окна слишком мал!";
+        mvwaddstr(bg_win, LINES / 2, (COLS - strlen_utf8(attention)) / 2, attention);
+    }
     
     wrefresh(bg_win);
     wrefresh(main_win);
