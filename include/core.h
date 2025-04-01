@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <pthread.h>
-#include <time.h>
 #include <wchar.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

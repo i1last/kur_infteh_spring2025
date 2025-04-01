@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <string.h>
-#include <time.h>
 #include <wchar.h>
 #include "curses.h"
 #include "core.h"
