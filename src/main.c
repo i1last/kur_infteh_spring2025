@@ -1,9 +1,12 @@
 #include <pthread.h>
+#include <locale.h>
 #include "curses.h"
 #include "interface.h"
 #include "core.h"
 
 int main() {
+    setlocale(LC_ALL, "");
+
     initscr();
     refresh();
     noecho();
@@ -34,4 +37,5 @@ int main() {
 - Нет функции проверки, сохранен ли файл (перед выходом)
 - Нет функции принудительного сохранения файла
 - Ограничить минимальный размер окна
+- Почистить код от неиспользуемых библиотек (как такие вычислить?)
 */

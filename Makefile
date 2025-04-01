@@ -1,6 +1,6 @@
 TARGET = kur
 CC = gcc
-CFLAGS = 
+CFLAGS = -DPDC_WIDE
 
 PREFIX_SRC = ./src/
 PREFIX_OBJ = ./obj/

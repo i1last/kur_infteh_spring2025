@@ -3,13 +3,14 @@
 #include <pthread.h>
 #include <string.h>
 #include <time.h>
+#include <wchar.h>
 #include "curses.h"
 #include "core.h"
 #include "interface.h"
 
 bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
-bool NOT_ASCII_KEY_IS_PRESSED = false;
+bool UNDEFINED_KEY_IS_PRESSED = false;
 
 int STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
@@ -17,16 +18,17 @@ int HORIZONTAL_SELECTED_OPTION = 0;
 int CURRENT_BUFFER_LEN = 0;
 int CURSOR_POS = 0;
 
-char BUFFER[MAX_BUFFER_LEN] = { 0 };
-char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
+wchar_t BUFFER[MAX_BUFFER_LEN] = { 0 };
+wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
 pthread_mutex_t mutex;
 
 void* keys_listener(void* arg) {
-    int pressed_char = 0;
+    wint_t pressed_char = 0;
 
     while (1) {
-        switch (pressed_char = getch()) {
+        get_wch(&pressed_char);
+        switch (pressed_char) {
         case 27:  // ESC button == 27
             if (STATE) STATE = 0;
             else IS_RUNNING = false;
@@ -52,37 +54,40 @@ void* keys_listener(void* arg) {
             if (CURRENT_BUFFER_LEN > 0) {
                 CURSOR_POS--;
                 
-                char temp_buffer[MAX_BUFFER_LEN] = { 0 };
+                wchar_t temp_buffer[MAX_BUFFER_LEN] = { 0 };
                 for (int i = 0; i < CURRENT_BUFFER_LEN; ++i) {
                     if (i < CURSOR_POS) temp_buffer[i] = BUFFER[i];
                     else if (i == CURSOR_POS) continue;
                     else temp_buffer[i - 1] = BUFFER[i];
                     
                 }
-                strcpy(BUFFER, temp_buffer);
+                wcscpy(BUFFER, temp_buffer);
                 CURRENT_BUFFER_LEN--;
             }
             break;
         default:
             if (CURRENT_BUFFER_LEN < MAX_BUFFER_LEN && (
-                    48 <= pressed_char && pressed_char <= 57  ||  // 0..9
-                    65 <= pressed_char && pressed_char <= 90  ||  // A..Z
-                    97 <= pressed_char && pressed_char <= 122 ||  // a..z
-                    pressed_char == 95                        ||  // _
-                    pressed_char == 45                            // -
+                    48   <= pressed_char && pressed_char <= 57   ||  // 0..9
+                    65   <= pressed_char && pressed_char <= 90   ||  // A..Z
+                    97   <= pressed_char && pressed_char <= 122  ||  // a..z
+                    1040 <= pressed_char && pressed_char <= 1103 ||  // а..Я
+                    pressed_char == 1105                         ||  // ё
+                    pressed_char == 95                           ||  // _
+                    pressed_char == 45                           ||  // -
+                    pressed_char == 46                               // .
                 )) {
                 CURRENT_BUFFER_LEN++;
                 
-                char temp_buffer[MAX_BUFFER_LEN] = { 0 };
+                wchar_t temp_buffer[MAX_BUFFER_LEN] = { 0 };
                 for (int i = 0; i < CURRENT_BUFFER_LEN; ++i) {
                     if (i < CURSOR_POS) temp_buffer[i] = BUFFER[i];
                     else if (i == CURSOR_POS) temp_buffer[i] = pressed_char;
                     else temp_buffer[i] = BUFFER[i - 1];
                 }
-                strcpy(BUFFER, temp_buffer);
+                wcscpy(BUFFER, temp_buffer);
 
                 CURSOR_POS++;
-            } else if (pressed_char > 128) NOT_ASCII_KEY_IS_PRESSED = true;
+            } else UNDEFINED_KEY_IS_PRESSED = true;
             break;
         }
         pthread_mutex_lock(&mutex);

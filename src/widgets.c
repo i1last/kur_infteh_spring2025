@@ -71,8 +71,8 @@ void make_widget_newfile(WINDOW* win) {
     if (ENTER_IS_PRESSED && (!file_is_exists()) && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
         
-        strcpy(CURRENT_FILENAME, BUFFER);
-        strcat(CURRENT_FILENAME, FILE_EXTENSION);
+        wcsncpy(CURRENT_FILENAME, BUFFER, MAX_BUFFER_LEN);
+        wcscat(CURRENT_FILENAME, FILE_EXTENSION);
         
         create_file();
         
@@ -85,9 +85,9 @@ void make_widget_newfile(WINDOW* win) {
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
 
     if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
-    if (NOT_ASCII_KEY_IS_PRESSED) {
-        mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
-        NOT_ASCII_KEY_IS_PRESSED = false;
+    if (UNDEFINED_KEY_IS_PRESSED) {
+        mvwprintw(box_win, 2, 2, " (!) Данные символы не поддерживаются ");
+        UNDEFINED_KEY_IS_PRESSED = false;
     }
     
     create_input_menu(&box_win);
@@ -102,8 +102,8 @@ void make_widget_newfile(WINDOW* win) {
 void make_widget_openfile(WINDOW* win) {
     if (ENTER_IS_PRESSED && file_is_exists() && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
-        strcpy(CURRENT_FILENAME, BUFFER);
-        strcat(CURRENT_FILENAME, FILE_EXTENSION);
+        wcsncpy(CURRENT_FILENAME, BUFFER, MAX_BUFFER_LEN);
+        wcscat(CURRENT_FILENAME, FILE_EXTENSION);
         STATE = 3;
         return;
     } else ENTER_IS_PRESSED = false;
@@ -113,9 +113,9 @@ void make_widget_openfile(WINDOW* win) {
     mvwprintw(box_win, 0, 2, "[ Введите имя файла ]");
 
     if (!file_is_exists() && (BUFFER[0] != '\0')) mvwprintw(box_win, 2, 2, " (!) Файла не существует ");
-    if (NOT_ASCII_KEY_IS_PRESSED) {
-        mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
-        NOT_ASCII_KEY_IS_PRESSED = false;
+    if (UNDEFINED_KEY_IS_PRESSED) {
+        mvwprintw(box_win, 2, 2, " (!) Данные символы не поддерживаются ");
+        UNDEFINED_KEY_IS_PRESSED = false;
     }
     
     create_input_menu(&box_win);
@@ -128,7 +128,7 @@ void make_widget_openfile(WINDOW* win) {
 }
 
 void make_widget_writefile(WINDOW* win) {
-    FILE* file = fopen(CURRENT_FILENAME, "r+");
+    FILE* file = _wfopen(CURRENT_FILENAME, L"r+");
     TableInfo data = read_csv(file);
 
     WINDOW* header_win = derwin(win, 2, getmaxx(win), 1, 0);
@@ -244,9 +244,9 @@ void make_widget_writefile(WINDOW* win) {
     //     WINDOW* box_win = create_box_input_window(&win);
         
     //     if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
-    //     if (NOT_ASCII_KEY_IS_PRESSED) {
+    //     if (UNDEFINED_KEY_IS_PRESSED) {
     //         mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
-    //         NOT_ASCII_KEY_IS_PRESSED = false;
+    //         UNDEFINED_KEY_IS_PRESSED = false;
     //     }
         
     //     create_input_menu(&box_win);

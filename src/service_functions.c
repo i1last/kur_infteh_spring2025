@@ -79,15 +79,15 @@ unsigned strlen_utf8(const char* str) {
 }
 
 bool file_is_exists(void) {
-    char filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
-    strcpy(filename, BUFFER);
-    strcat(filename, FILE_EXTENSION);
+    wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
+    wcscpy(filename, BUFFER);
+    wcscat(filename, FILE_EXTENSION);
 
     WIN32_FIND_DATA find_data;
     HANDLE hFind = FindFirstFile("*", &find_data);
 
     do {
-        if (!strcmp(find_data.cFileName, filename)) {
+        if (!wcscmp((wchar_t*)find_data.cFileName, filename)) {
             FindClose(hFind);
             return true;
         }
@@ -101,7 +101,7 @@ bool file_is_exists(void) {
 int create_file(void) {
     if (file_is_exists()) return 1;
     
-    FILE* file = fopen(CURRENT_FILENAME, "w");
+    FILE* file = _wfopen(CURRENT_FILENAME, L"w");
     fclose(file);
 
     return 0;

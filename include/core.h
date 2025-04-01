@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <time.h>
+#include <wchar.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX_BUFFER_LEN 64
 #define MAX_COLS_IN_TABLE 5
 #define MAX_FILE_EXTENSION_LEN 4
-#define FILE_EXTENSION ".csv"
+#define FILE_EXTENSION L".csv"
 
 extern pthread_mutex_t mutex;
 
@@ -18,7 +19,7 @@ extern bool IS_RUNNING;
 
 extern bool ENTER_IS_PRESSED;
 
-extern bool NOT_ASCII_KEY_IS_PRESSED;
+extern bool UNDEFINED_KEY_IS_PRESSED;
 
 extern int STATE;
 
@@ -30,9 +31,9 @@ extern int CURRENT_BUFFER_LEN;
 
 extern int CURSOR_POS;
 
-extern char BUFFER[MAX_BUFFER_LEN];
+extern wchar_t BUFFER[MAX_BUFFER_LEN];
 
-extern char CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
+extern wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 
 extern struct TableState TABLE_STATE;
 
