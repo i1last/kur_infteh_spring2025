@@ -7,12 +7,15 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 #define MAX_BUFFER_LEN 64
 #define MAX_COLS_IN_TABLE 5
 #define MAX_FILE_EXTENSION_LEN 4
-#define FILE_EXTENSION L".csv"
 #define MIN_TERM_COLS 75
 #define MIN_TERM_ROWS 20
+
+#define FILE_EXTENSION L".csv"
+#define __INPUTMENU__CHAR_NOT_SUPPORTED " (!) Данные символы не поддерживаются "
 
 extern pthread_mutex_t mutex;
 

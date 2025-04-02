@@ -86,7 +86,7 @@ void make_widget_newfile(WINDOW* win) {
 
     if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
     if (UNDEFINED_KEY_IS_PRESSED) {
-        mvwprintw(box_win, 2, 2, " (!) Данные символы не поддерживаются ");
+        mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
         UNDEFINED_KEY_IS_PRESSED = false;
     }
     
@@ -114,7 +114,7 @@ void make_widget_openfile(WINDOW* win) {
 
     if (!file_is_exists() && (BUFFER[0] != '\0')) mvwprintw(box_win, 2, 2, " (!) Файла не существует ");
     if (UNDEFINED_KEY_IS_PRESSED) {
-        mvwprintw(box_win, 2, 2, " (!) Данные символы не поддерживаются ");
+        mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
         UNDEFINED_KEY_IS_PRESSED = false;
     }
     
@@ -238,24 +238,23 @@ void make_widget_writefile(WINDOW* win) {
     }
 
     /********************************* EDIT MENU ******************************************/
-    // if (ENTER_IS_PRESSED) {
-    //     ENTER_IS_PRESSED = false;
+    if (ENTER_IS_PRESSED) {
+        ENTER_IS_PRESSED = false;
         
-    //     WINDOW* box_win = create_box_input_window(&win);
+        WINDOW* box_win = create_box_input_window(&win);
         
-    //     if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
-    //     if (UNDEFINED_KEY_IS_PRESSED) {
-    //         mvwprintw(box_win, 2, 2, " (!) Поддерживается только латиница ");
-    //         UNDEFINED_KEY_IS_PRESSED = false;
-    //     }
+        if (UNDEFINED_KEY_IS_PRESSED) {
+            mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
+            UNDEFINED_KEY_IS_PRESSED = false;
+        }
         
-    //     create_input_menu(&box_win);
+        create_input_menu(&box_win);
         
-    //     wrefresh(box_win);
-    //     delwin(box_win);
+        wrefresh(box_win);
+        delwin(box_win);
         
-    //     return;
-    // }
+        return;
+    }
         
     wrefresh(table_win);
     wrefresh(scroll_win);
