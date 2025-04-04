@@ -78,7 +78,7 @@ unsigned strlen_utf8(const char* str) {
     return len;
 }
 
-bool file_is_exists(void) {
+bool file_exists(void) {
     wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
     wcscpy(filename, BUFFER);
     wcscat(filename, FILE_EXTENSION);
@@ -87,10 +87,17 @@ bool file_is_exists(void) {
     HANDLE hFind = FindFirstFile("*", &find_data);
 
     do {
-        if (!wcscmp((wchar_t*)find_data.cFileName, filename)) {
+        wchar_t c_filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
+        char* windows_c_filename = find_data.cFileName;
+        for (int i = 0; windows_c_filename[i] != '\0'; i++) {
+            c_filename[i] = (wchar_t)windows_c_filename[i];
+        }
+        
+        if (!wcscmp(c_filename, filename)) {
             FindClose(hFind);
             return true;
         }
+        
     } while (FindNextFile(hFind, &find_data));
 
     FindClose(hFind);
@@ -99,7 +106,7 @@ bool file_is_exists(void) {
 }
 
 int create_file(void) {
-    if (file_is_exists()) return 1;
+    if (file_exists()) return 1;
     
     FILE* file = _wfopen(CURRENT_FILENAME, L"w");
     fclose(file);
