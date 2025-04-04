@@ -12,6 +12,7 @@ bool ENTER_IS_PRESSED = false;
 bool UNDEFINED_KEY_IS_PRESSED = false;
 
 int STATE = 0;
+int SUB_STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
 int HORIZONTAL_SELECTED_OPTION = 0;
 int CURRENT_BUFFER_LEN = 0;
@@ -40,7 +41,7 @@ void* keys_listener(void* arg) {
             break;
         case KEY_RIGHT:
             HORIZONTAL_SELECTED_OPTION++;
-            CURSOR_POS = MIN(MAX_BUFFER_LEN, CURSOR_POS + 1);
+            CURSOR_POS = MIN(CURRENT_BUFFER_LEN, CURSOR_POS + 1);
             break;
         case KEY_LEFT:
             HORIZONTAL_SELECTED_OPTION--;
@@ -109,8 +110,9 @@ void* term_size_listener(void* arg) {
 
 void* state_listener(void* arg) {
     int prev_state = STATE;
+    int prev_sub_state = SUB_STATE;
 
-    while (1) if (STATE != prev_state) {
+    while (1) if (STATE != prev_state || SUB_STATE != prev_sub_state) {
         prev_state = STATE;
         
         memset(BUFFER, '\0', sizeof(BUFFER));
