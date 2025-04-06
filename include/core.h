@@ -15,7 +15,7 @@
 #define MIN_TERM_ROWS 20
 
 #define FILE_EXTENSION L".csv"
-#define __INPUTMENU__CHAR_NOT_SUPPORTED " (!) Данные символы не поддерживаются "
+#define __INPUTMENU__CHAR_NOT_SUPPORTED "[ (!) Данные символы не поддерживаются ]"
 
 extern pthread_mutex_t mutex;
 
@@ -26,6 +26,8 @@ extern bool ENTER_IS_PRESSED;
 extern bool UNDEFINED_KEY_IS_PRESSED;
 
 extern int STATE;
+
+extern int SUB_STATE;
 
 extern int VERTICAL_SELECTED_OPTION;
 
@@ -39,7 +41,16 @@ extern wchar_t BUFFER[MAX_BUFFER_LEN];
 
 extern wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 
-extern struct TableState TABLE_STATE;
+typedef struct {
+    int col, row;
+    wchar_t* text;
+} TableCell;
+
+typedef struct {
+    TableCell* cells;
+    unsigned cells_size;
+    unsigned cells_count;
+} EditedTableInfo;
 
 typedef struct {
     char* text[MAX_COLS_IN_TABLE];
@@ -48,7 +59,10 @@ typedef struct {
 typedef struct {
     TableRow* rows;
     int row_count;
+    wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 } TableInfo;
+
+extern EditedTableInfo EDITED_TABLE_INFO;
 
 void* keys_listener(void* arg);
 

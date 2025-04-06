@@ -33,6 +33,7 @@ WINDOW* create_box_input_window(WINDOW** win) {
 void create_input_menu(WINDOW** box_win) {
     WINDOW* input_win = derwin(*box_win, getmaxy(*box_win) - 2, getmaxx(*box_win) - 2, 1, 1);
     
+    // Заполняем текст из буфера
     for (int i = 0; i < CURRENT_BUFFER_LEN; i++) {
         if (i == CURSOR_POS) wattron(input_win, A_REVERSE);
         waddch(input_win, BUFFER[i]);
@@ -44,6 +45,11 @@ void create_input_menu(WINDOW** box_win) {
         wattron(input_win, A_REVERSE);
         waddch(input_win, ' ');
         wattroff(input_win, A_REVERSE);
+    }
+
+    // Заполняем оставшееся пространство пробелами
+    for (int i = CURRENT_BUFFER_LEN; i <= MAX_BUFFER_LEN; i++) {
+        waddch(input_win, ' ');
     }
 
     wrefresh(input_win);
@@ -105,15 +111,6 @@ bool file_exists(void) {
     return false;
 }
 
-int create_file(void) {
-    if (file_exists()) return 1;
-    
-    FILE* file = _wfopen(CURRENT_FILENAME, L"w");
-    fclose(file);
-
-    return 0;
-}
-
 TableInfo read_csv(FILE* file) {
     char* delim = ";,";
 
@@ -141,8 +138,75 @@ TableInfo read_csv(FILE* file) {
 
     TableInfo data = {
         .rows = rows,
-        .row_count = row_count
+        .row_count = row_count,
     };
+    wcsncpy(data.filename, CURRENT_FILENAME, MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN);
 
     return data;
 }
+
+int create_file(void) {
+    if (file_exists()) return 1;
+    
+    FILE* file = _wfopen(CURRENT_FILENAME, L"w");
+    fclose(file);
+
+    return 0;
+}
+
+void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int col) {
+    size_t required_size = wcstombs(NULL, wide_text, 0);
+        
+    char* text = malloc(required_size + 1);
+    wcstombs(text, wide_text, required_size + 1);
+
+    if (data->rows[row].text[col] != NULL) {
+        free(data->rows[row].text[col]);
+        data->rows[row].text[col] = NULL;
+    }
+
+    data->rows[row].text[col] = text;
+    return;
+}
+
+void save_file(void) { // TODO: добавить проверку на существование файла
+    FILE* file = _wfopen(CURRENT_FILENAME, L"r");
+    TableInfo data = read_csv(file);
+    fclose(file);
+
+    file = _wfopen(CURRENT_FILENAME, L"w");
+
+    // Добавляем измененные ячейки в таблицу
+    for (int i = 0; i < EDITED_TABLE_INFO.cells_count; i++) {
+        int row = EDITED_TABLE_INFO.cells[i].row;
+        int col = EDITED_TABLE_INFO.cells[i].col;
+
+        wchar_t* wide_text = EDITED_TABLE_INFO.cells[i].text;
+        write_widestr_to_table(wide_text, &data, row, col);
+    }
+
+    // Записываем измененную таблицу в файл
+    for (int i = 0; i < data.row_count; i++) {
+        for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
+            char* cell_text = data.rows[i].text[j];
+            if (cell_text == NULL) cell_text = "";
+
+            fprintf(file, "%s", cell_text);
+
+            if (j < MAX_COLS_IN_TABLE - 1) fprintf(file, ",");
+        }
+    }
+
+    fclose(file);
+
+    return;
+}
+
+// TODO: добавить окно с вопросом о сохранении файла
+// void ask_to_save_file(void) {
+//     WINDOW* ask_win = derwin(stdscr, 3, 30, getmaxy(stdscr) / 2, getmaxx(stdscr) / 2 - 15);
+//     box(ask_win, 0, 0);
+//     mvwprintw(ask_win, 1, 1, "Save file? (y/n)");
+//     wrefresh(ask_win);
+//     delwin(ask_win);
+// }

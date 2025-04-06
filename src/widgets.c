@@ -68,7 +68,7 @@ void make_widget_homepage(WINDOW* win) {
 }
 
 void make_widget_newfile(WINDOW* win) {
-    if (ENTER_IS_PRESSED && (!file_is_exists()) && (BUFFER[0] != '\0')) {
+    if (ENTER_IS_PRESSED && (!file_exists()) && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
         
         wcsncpy(CURRENT_FILENAME, BUFFER, MAX_BUFFER_LEN);
@@ -84,7 +84,7 @@ void make_widget_newfile(WINDOW* win) {
     
     mvwprintw(box_win, 0, 2, "[ Введите имя нового файла ]");
 
-    if (file_is_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
+    if (file_exists()) mvwprintw(box_win, 2, 2, " (!) Файл уже существует ");
     if (UNDEFINED_KEY_IS_PRESSED) {
         mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
         UNDEFINED_KEY_IS_PRESSED = false;
@@ -100,7 +100,7 @@ void make_widget_newfile(WINDOW* win) {
 }
 
 void make_widget_openfile(WINDOW* win) {
-    if (ENTER_IS_PRESSED && file_is_exists() && (BUFFER[0] != '\0')) {
+    if (ENTER_IS_PRESSED && file_exists() && (BUFFER[0] != '\0')) {
         ENTER_IS_PRESSED = false;
         wcsncpy(CURRENT_FILENAME, BUFFER, MAX_BUFFER_LEN);
         wcscat(CURRENT_FILENAME, FILE_EXTENSION);
@@ -112,7 +112,7 @@ void make_widget_openfile(WINDOW* win) {
     
     mvwprintw(box_win, 0, 2, "[ Введите имя файла ]");
 
-    if (!file_is_exists() && (BUFFER[0] != '\0')) mvwprintw(box_win, 2, 2, " (!) Файла не существует ");
+    if (!file_exists() && (BUFFER[0] != '\0')) mvwprintw(box_win, 2, 2, " (!) Файла не существует ");
     if (UNDEFINED_KEY_IS_PRESSED) {
         mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
         UNDEFINED_KEY_IS_PRESSED = false;
@@ -127,9 +127,16 @@ void make_widget_openfile(WINDOW* win) {
     return;
 }
 
+/*
+SUB_STATEs:
+0 - просмотр таблицы
+1 - изменение ячейки
+*/
 void make_widget_writefile(WINDOW* win) {
     FILE* file = _wfopen(CURRENT_FILENAME, L"r+");
-    TableInfo data = read_csv(file);
+    static TableInfo data = { NULL, 0, { 0 } };
+    if (wcscmp(data.filename, CURRENT_FILENAME)) 
+        data = read_csv(file);
 
     WINDOW* header_win = derwin(win, 2, getmaxx(win), 1, 0);
     WINDOW* table_win  = derwin(win, getmaxy(win) - 4, getmaxx(win), 3, 0);
@@ -237,10 +244,39 @@ void make_widget_writefile(WINDOW* win) {
         }
     }
 
-    /********************************* EDIT MENU ******************************************/
-    if (ENTER_IS_PRESSED) {
+    /********************************* ENTER LOGIC ******************************************/
+
+    if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;
+        SUB_STATE = 1;
+    } else if (ENTER_IS_PRESSED && SUB_STATE == 1) {
+        ENTER_IS_PRESSED = false;
+
+        if (EDITED_TABLE_INFO.cells_count >= EDITED_TABLE_INFO.cells_size) { // TODO: добавить проверку realloc_ptr и wcsdup на NULL
+            unsigned new_size = EDITED_TABLE_INFO.cells_size + 1;
+            TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
+            EDITED_TABLE_INFO.cells = realloc_ptr;
+            EDITED_TABLE_INFO.cells_size = new_size;
+        }
         
+        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].col = h_selected;
+        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].row = absolute_v_selected;
+        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].text = wcsdup(BUFFER);
+        
+        write_widestr_to_table(
+            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].text,
+            &data,
+            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].row,
+            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].col
+        );
+        
+        EDITED_TABLE_INFO.cells_count += 1;
+
+        SUB_STATE = 0;
+    }
+
+    /********************************* EDIT MENU ******************************************/
+    if (SUB_STATE == 1) {
         WINDOW* box_win = create_box_input_window(&win);
         
         if (UNDEFINED_KEY_IS_PRESSED) {
@@ -252,8 +288,6 @@ void make_widget_writefile(WINDOW* win) {
         
         wrefresh(box_win);
         delwin(box_win);
-        
-        return;
     }
         
     wrefresh(table_win);
