@@ -7,6 +7,20 @@
 #include "service_functions.h"
 #include "core.h"
 
+void wide_to_char(wchar_t** _sorce_wide_text, char** _dest_char_text) {
+    size_t required_size = WideCharToMultiByte(CP_UTF8, 0, *_sorce_wide_text, -1, NULL, 0, NULL, NULL);
+    *_dest_char_text = (char*)malloc(required_size * sizeof(char));
+    WideCharToMultiByte(CP_UTF8, 0, *_sorce_wide_text, -1, *_dest_char_text, required_size, NULL, NULL);
+    return;
+}
+
+void char_to_wide(char** _source_char_text, wchar_t** _dest_wide_text) {
+    size_t required_size = MultiByteToWideChar(CP_UTF8, 0, *_source_char_text, -1, NULL, 0);
+    *_dest_wide_text = (wchar_t*)malloc(required_size * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, *_source_char_text, -1, *_dest_wide_text, required_size);
+    return;
+}
+
 /*
 mvwaddnstr использует для счетчика символов в строке strlen, который некорректно считает количество
 символов в строке с кириллицей (не умеет работать с utf8). Именно поэтому используется переменная
@@ -155,10 +169,8 @@ int create_file(void) {
 }
 
 void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int col) {
-    size_t required_size = WideCharToMultiByte(CP_UTF8, 0, wide_text, -1, NULL, 0, NULL, NULL);
-        
-    char* text = malloc(required_size + 1);
-    WideCharToMultiByte(CP_UTF8, 0, wide_text, -1, text, required_size, NULL, NULL);
+    char* text;
+    wide_to_char(&wide_text, &text);
 
     if (data->rows[row].text[col] != NULL) {
         free(data->rows[row].text[col]);

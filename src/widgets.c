@@ -331,9 +331,7 @@ void make_widget_writefile(WINDOW* win) {
                 EDITED_TABLE_INFO.cells[edit_index].row = i;
 
                 // Требуется приведение от char* к wchar_t*
-                int wide_len = MultiByteToWideChar(CP_UTF8, 0, data.rows[i].text[j], -1, NULL, 0);
-                EDITED_TABLE_INFO.cells[edit_index].text = (wchar_t*)malloc(wide_len * sizeof(wchar_t));
-                MultiByteToWideChar(CP_UTF8, 0, data.rows[i].text[j], -1, EDITED_TABLE_INFO.cells[edit_index].text, wide_len);
+                char_to_wide(&data.rows[i].text[j], &EDITED_TABLE_INFO.cells[edit_index].text);
             }
         }
 

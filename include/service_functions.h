@@ -6,6 +6,10 @@
 #include <wchar.h>
 #include "core.h"
 
+void wide_to_char(wchar_t** _sorce_wide_text, char** _dest_char_text);
+
+void char_to_wide(char** _source_char_text, wchar_t** _dest_wide_text);
+
 int convert_strlen_to_strlen_utf8(int condition, char** text);
 
 WINDOW* create_box_input_window(WINDOW** win);
