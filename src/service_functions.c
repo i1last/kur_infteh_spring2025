@@ -181,6 +181,14 @@ void save_file(void) { // TODO: добавить проверку на суще�
         int row = EDITED_TABLE_INFO.cells[i].row;
         int col = EDITED_TABLE_INFO.cells[i].col;
 
+        if (row > data.row_count - 1) {
+            data.row_count++;
+            data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+            for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
+                data.rows[data.row_count - 1].text[j] = NULL;
+            }
+        }
+
         wchar_t* wide_text = EDITED_TABLE_INFO.cells[i].text;
         write_widestr_to_table(wide_text, &data, row, col);
     }

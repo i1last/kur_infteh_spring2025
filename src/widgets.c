@@ -245,15 +245,15 @@ void make_widget_writefile(WINDOW* win) {
     }
 
     /********************************* KEYS LOGIC ******************************************/
-    if (CTRL_N_IS_PRESSED) {
-        CTRL_N_IS_PRESSED = false;
+    // if (CTRL_N_IS_PRESSED) {
+    //     CTRL_N_IS_PRESSED = false;
         
-        data.row_count++;
-        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
-        for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-            data.rows[data.row_count - 1].text[i] = NULL;
-        }
-    }
+    //     data.row_count++;
+    //     data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+    //     for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
+    //         data.rows[data.row_count - 1].text[i] = NULL;
+    //     }
+    // } WIP
 
     if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;
@@ -261,27 +261,52 @@ void make_widget_writefile(WINDOW* win) {
     } else if (ENTER_IS_PRESSED && SUB_STATE == 1) {
         ENTER_IS_PRESSED = false;
 
-        if (EDITED_TABLE_INFO.cells_count >= EDITED_TABLE_INFO.cells_size) { // TODO: добавить проверку realloc_ptr и wcsdup на NULL
+        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
+
+        if (last_cell >= EDITED_TABLE_INFO.cells_size) { // TODO: добавить проверку realloc_ptr и wcsdup на NULL
             unsigned new_size = EDITED_TABLE_INFO.cells_size + 1;
             TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
             EDITED_TABLE_INFO.cells = realloc_ptr;
             EDITED_TABLE_INFO.cells_size = new_size;
         }
-        
-        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].col = h_selected;
-        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].row = absolute_v_selected;
-        EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].text = wcsdup(BUFFER);
+   
+        EDITED_TABLE_INFO.cells[last_cell].col = h_selected;
+        EDITED_TABLE_INFO.cells[last_cell].row = absolute_v_selected;
+        EDITED_TABLE_INFO.cells[last_cell].text = wcsdup(BUFFER);
         
         write_widestr_to_table(
-            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].text,
+            EDITED_TABLE_INFO.cells[last_cell].text,
             &data,
-            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].row,
-            EDITED_TABLE_INFO.cells[EDITED_TABLE_INFO.cells_count].col
+            EDITED_TABLE_INFO.cells[last_cell].row,
+            EDITED_TABLE_INFO.cells[last_cell].col
         );
-        
+    
         EDITED_TABLE_INFO.cells_count += 1;
 
         SUB_STATE = 0;
+    } else if (CTRL_N_IS_PRESSED) {
+        CTRL_N_IS_PRESSED = false;
+
+        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
+        unsigned count_of_new_cells = 5;
+
+        if (last_cell + count_of_new_cells - 1 >= EDITED_TABLE_INFO.cells_size) {
+            unsigned new_size = EDITED_TABLE_INFO.cells_size + count_of_new_cells;
+            TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
+            EDITED_TABLE_INFO.cells = realloc_ptr;
+            EDITED_TABLE_INFO.cells_size = new_size;
+        }
+
+        data.row_count++;
+        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+        for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
+            data.rows[data.row_count - 1].text[i] = NULL;
+            EDITED_TABLE_INFO.cells[last_cell + i].col = i;
+            EDITED_TABLE_INFO.cells[last_cell + i].row = data.row_count - 1;
+            EDITED_TABLE_INFO.cells[last_cell + i].text = NULL;
+        }
+        
+        EDITED_TABLE_INFO.cells_count += count_of_new_cells;
     }
 
     /********************************* EDIT MENU ******************************************/
