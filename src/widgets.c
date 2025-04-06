@@ -248,7 +248,10 @@ void make_widget_writefile(WINDOW* win) {
     if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;
         SUB_STATE = 1;
-    } else if (ENTER_IS_PRESSED && SUB_STATE == 1) { // Изменение единичной ячейки
+    } 
+    
+    // === Изменение единичной ячейки ===
+    else if (ENTER_IS_PRESSED && SUB_STATE == 1) {
         ENTER_IS_PRESSED = false;
 
         unsigned last_cell = EDITED_TABLE_INFO.cells_count;
@@ -276,8 +279,11 @@ void make_widget_writefile(WINDOW* win) {
         EDITED_TABLE_INFO.cells_count += 1;
 
         SUB_STATE = 0;
-    } else if (CTRL_N_IS_PRESSED) { // Добавление новой строки
-        CTRL_N_IS_PRESSED = false;
+    } 
+    
+    // === Добавление новой строки ===
+    else if (COMMAND_KEY_IS_PRESSED == 14) {
+        COMMAND_KEY_IS_PRESSED = 0;
 
         unsigned last_cell = EDITED_TABLE_INFO.cells_count;
 
@@ -303,8 +309,11 @@ void make_widget_writefile(WINDOW* win) {
 
         EDITED_TABLE_INFO.cells_count += MAX_COLS_IN_TABLE;
         EDITED_TABLE_INFO.row_count_in_table = data.row_count;
-    } else if (DELETE_IS_PRESSED) { // Удаление строки
-        DELETE_IS_PRESSED = false;
+    } 
+    
+    // === Удаление строки ===
+    else if (COMMAND_KEY_IS_PRESSED == 330) {
+        COMMAND_KEY_IS_PRESSED = 0;
         
         unsigned last_cell = EDITED_TABLE_INFO.cells_count;
         unsigned affected_rows = data.row_count - absolute_v_selected - 1;
@@ -343,6 +352,46 @@ void make_widget_writefile(WINDOW* win) {
         EDITED_TABLE_INFO.row_count_in_table = data.row_count;
     }
 
+    // === Сортировка по возрастанию ===
+    else if (COMMAND_KEY_IS_PRESSED == 21) {
+        COMMAND_KEY_IS_PRESSED = 0;
+
+        // Сортировка по возрастанию
+        sort_table(&data, h_selected, true);
+
+        pthread_t update_tui_TID;
+        pthread_create(&update_tui_TID, NULL, update_tui, NULL);
+        // TODO: создать функцию, которая будет фиксировать изменненые ячейки и только их добавлять в EDITED_TABLE_INFO
+    }
+
+    // === Сортировка по убыванию ===
+    else if (COMMAND_KEY_IS_PRESSED == 4) {
+        COMMAND_KEY_IS_PRESSED = 0;
+
+        // Сортировка по убыванию
+        sort_table(&data, h_selected, false);
+
+        pthread_t update_tui_TID;
+        pthread_create(&update_tui_TID, NULL, update_tui, NULL);
+        // TODO: создать функцию, которая будет фиксировать изменненые ячейки и только их добавлять в EDITED_TABLE_INFO
+    }
+
+    // === Поиск по названию ===
+    else if (COMMAND_KEY_IS_PRESSED == 6) {
+        COMMAND_KEY_IS_PRESSED = 0;
+
+        // Поиск по названию
+        
+    }
+
+    // === Общая информация ===
+    else if (COMMAND_KEY_IS_PRESSED == 9) {
+        COMMAND_KEY_IS_PRESSED = 0;
+
+        // Общая информация
+        
+    }
+    
     /********************************* EDIT MENU ******************************************/
     if (SUB_STATE == 1) {
         WINDOW* box_win = create_box_input_window(&win);

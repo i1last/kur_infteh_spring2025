@@ -7,6 +7,30 @@
 #include "service_functions.h"
 #include "core.h"
 
+int _CR_sort_col;
+bool _CR_ascending;
+
+int compare_rows(const void* a, const void* b) {
+    const TableRow* row1 = (const TableRow*)a;
+    const TableRow* row2 = (const TableRow*)b;
+
+    int result = strcmp(
+        row1->text[_CR_sort_col], 
+        row2->text[_CR_sort_col]
+    );
+    
+    return _CR_ascending ? result : -result;
+}
+
+void sort_table(TableInfo* data, int sort_col, bool ascending) {
+    if (data->rows == NULL || data->row_count <= 1) return;
+    
+    _CR_sort_col = sort_col;
+    _CR_ascending = ascending;
+
+    qsort(data->rows, data->row_count, sizeof(TableRow), compare_rows);
+}
+
 void wide_to_char(wchar_t** _sorce_wide_text, char** _dest_char_text) {
     size_t required_size = WideCharToMultiByte(CP_UTF8, 0, *_sorce_wide_text, -1, NULL, 0, NULL, NULL);
     *_dest_char_text = (char*)malloc(required_size * sizeof(char));

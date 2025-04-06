@@ -11,9 +11,8 @@
 bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
 bool UNDEFINED_KEY_IS_PRESSED = false;
-bool CTRL_N_IS_PRESSED = false;
-bool DELETE_IS_PRESSED = false;
 
+int COMMAND_KEY_IS_PRESSED = 0;
 int STATE = 0;
 int SUB_STATE = 0;
 int VERTICAL_SELECTED_OPTION = 0;
@@ -43,48 +42,73 @@ void* keys_listener(void* arg) {
             } else if (STATE) STATE = 0;
             else IS_RUNNING = false;
             break;
+
         case 330: // DELETE
             if (STATE == 3 && ask_user("Удалить строку?")) {
-                DELETE_IS_PRESSED = true;
+                COMMAND_KEY_IS_PRESSED = pressed_char;
                 pthread_mutex_lock(&mutex);
                 make_tui();
                 pthread_mutex_unlock(&mutex);
             }
             break;
+
         case 19: // ctrl + s
             if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
                 save_file();
             }
             break;
+
         case 14: // ctrl + n
             if (STATE == 3) {
-                CTRL_N_IS_PRESSED = true;
+                COMMAND_KEY_IS_PRESSED = pressed_char;
                 pthread_mutex_lock(&mutex);
                 make_tui();
                 pthread_mutex_unlock(&mutex);
             }
             break;
+
+        case 21: // ctrl + u
+            COMMAND_KEY_IS_PRESSED = pressed_char;
+            break;
+
+        case 4: // ctrl + d
+            COMMAND_KEY_IS_PRESSED = pressed_char;
+            break;
+
+        case 6: // ctrl + f
+            COMMAND_KEY_IS_PRESSED = pressed_char;
+            break;
+
+        case 9: // ctrl + i
+            COMMAND_KEY_IS_PRESSED = pressed_char;
+            break;
+
         case KEY_UP:
             VERTICAL_SELECTED_OPTION--;
             if (SUB_STATE) VERTICAL_SELECTED_OPTION++;
             break;
+
         case KEY_DOWN:
             VERTICAL_SELECTED_OPTION++;
             if (SUB_STATE) VERTICAL_SELECTED_OPTION--;
             break;
+
         case KEY_RIGHT:
             HORIZONTAL_SELECTED_OPTION++;
             CURSOR_POS = MIN(CURRENT_BUFFER_LEN, CURSOR_POS + 1);
             if (SUB_STATE) HORIZONTAL_SELECTED_OPTION--;
             break;
+
         case KEY_LEFT:
             HORIZONTAL_SELECTED_OPTION--;
             CURSOR_POS = MAX(1, CURSOR_POS - 1);
             if (SUB_STATE) HORIZONTAL_SELECTED_OPTION++;
             break;
+
         case 10: // ENTER
             ENTER_IS_PRESSED = true;
             break;
+
         case 8: // BACKSPACE
             if (CURRENT_BUFFER_LEN > 0) {
                 CURSOR_POS--;
@@ -100,6 +124,7 @@ void* keys_listener(void* arg) {
                 CURRENT_BUFFER_LEN--;
             }
             break;
+
         default:
             if (CURRENT_BUFFER_LEN < MAX_BUFFER_LEN && (
                     48   <= pressed_char && pressed_char <= 57   ||  // 0..9
@@ -152,6 +177,7 @@ void* state_listener(void* arg) {
         memset(BUFFER, '\0', sizeof(BUFFER));
         CURRENT_BUFFER_LEN = 0;
         CURSOR_POS = 0;
+        COMMAND_KEY_IS_PRESSED = 0;
 
         // if only STATE changed
         if (STATE != prev_state) {
@@ -170,6 +196,14 @@ void* state_listener(void* arg) {
         prev_state = STATE;
         prev_sub_state = SUB_STATE;
     }
+
+    return NULL;
+}
+
+void* update_tui(void* arg) {
+    pthread_mutex_lock(&mutex);
+    make_tui();
+    pthread_mutex_unlock(&mutex);
 
     return NULL;
 }

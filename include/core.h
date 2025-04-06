@@ -25,9 +25,7 @@ extern bool ENTER_IS_PRESSED;
 
 extern bool UNDEFINED_KEY_IS_PRESSED;
 
-extern bool CTRL_N_IS_PRESSED;
-
-extern bool DELETE_IS_PRESSED;
+extern int COMMAND_KEY_IS_PRESSED;
 
 extern int STATE;
 
@@ -74,5 +72,7 @@ void* keys_listener(void* arg);
 void* term_size_listener(void* arg);
 
 void* state_listener(void* arg);
+
+void* update_tui(void* arg);
 
 #endif

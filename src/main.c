@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         char* extension = strstr(argv[1], ".csv");
 
-        // Если .csv нет или не в конце строки
+        // Если не оканчивается на ".csv"
         if (extension == NULL || extension[4] != '\0') {
             swprintf(BUFFER, MAX_BUFFER_LEN, L"%hs", argv[1]);
         } else {
