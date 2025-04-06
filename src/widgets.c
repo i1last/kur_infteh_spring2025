@@ -2,7 +2,6 @@
 #include <pthread.h>
 #include <string.h>
 #include <time.h>
-#include <windows.h>
 #include "widgets.h"
 #include "service_functions.h"
 #include "core.h"
