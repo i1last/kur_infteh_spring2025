@@ -189,6 +189,11 @@ void save_file(void) { // TODO: добавить проверку на суще�
             }
         }
 
+        if (EDITED_TABLE_INFO.row_count_in_table < data.row_count) {
+            data.row_count = EDITED_TABLE_INFO.row_count_in_table;
+            data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+        }
+
         wchar_t* wide_text = EDITED_TABLE_INFO.cells[i].text;
         write_widestr_to_table(wide_text, &data, row, col);
     }
@@ -215,15 +220,17 @@ void save_file(void) { // TODO: добавить проверку на суще�
     return;
 }
 
-void ask_to_save_file(void) {
-    char* question = "Сохранить файл? [Y / n]";
-    int question_len = strlen_utf8(question);
+bool ask_user(char* question) {
+    char* full_question;
+    strcpy(full_question, question);
+    strcat(full_question, " [Y / n]");
+    int full_question_len = strlen_utf8(full_question);
 
-    WINDOW* ask_win = derwin(stdscr, 3, question_len + 2, getmaxy(stdscr) / 2, (getmaxx(stdscr) - question_len) / 2);
+    WINDOW* ask_win = derwin(stdscr, 3, full_question_len + 2, getmaxy(stdscr) / 2, (getmaxx(stdscr) - full_question_len) / 2);
     
     wattron(ask_win, COLOR_PAIR(1));
     box(ask_win, 0, 0);
-    mvwprintw(ask_win, 1, 1, question);
+    mvwprintw(ask_win, 1, 1, full_question);
     wattroff(ask_win, COLOR_PAIR(1));
     
     wrefresh(ask_win);
@@ -233,10 +240,9 @@ void ask_to_save_file(void) {
         int pressed_char = getch();
 
         if (pressed_char == 'y' || pressed_char == 'Y') {
-            save_file();
-            break;
-        } else if (pressed_char == 'n' || pressed_char == 'N') break;
+            return true;
+        } else if (pressed_char == 'n' || pressed_char == 'N') {
+            return false;
+        }
     }
-
-    return;
 }

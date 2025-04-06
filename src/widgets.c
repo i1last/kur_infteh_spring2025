@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <time.h>
+#include <windows.h>
 #include "widgets.h"
 #include "service_functions.h"
 #include "core.h"
@@ -248,11 +249,12 @@ void make_widget_writefile(WINDOW* win) {
     if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;
         SUB_STATE = 1;
-    } else if (ENTER_IS_PRESSED && SUB_STATE == 1) {
+    } else if (ENTER_IS_PRESSED && SUB_STATE == 1) { // Изменение единичной ячейки
         ENTER_IS_PRESSED = false;
 
         unsigned last_cell = EDITED_TABLE_INFO.cells_count;
 
+        // Выделяем память под новую ячейку
         if (last_cell >= EDITED_TABLE_INFO.cells_size) { // TODO: добавить проверку realloc_ptr и wcsdup на NULL
             unsigned new_size = EDITED_TABLE_INFO.cells_size + 1;
             TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
@@ -260,6 +262,7 @@ void make_widget_writefile(WINDOW* win) {
             EDITED_TABLE_INFO.cells_size = new_size;
         }
    
+        // Записываем данные в новую ячейку
         EDITED_TABLE_INFO.cells[last_cell].col = h_selected;
         EDITED_TABLE_INFO.cells[last_cell].row = absolute_v_selected;
         EDITED_TABLE_INFO.cells[last_cell].text = wcsdup(BUFFER);
@@ -274,29 +277,73 @@ void make_widget_writefile(WINDOW* win) {
         EDITED_TABLE_INFO.cells_count += 1;
 
         SUB_STATE = 0;
-    } else if (CTRL_N_IS_PRESSED) {
+    } else if (CTRL_N_IS_PRESSED) { // Добавление новой строки
         CTRL_N_IS_PRESSED = false;
 
         unsigned last_cell = EDITED_TABLE_INFO.cells_count;
-        unsigned count_of_new_cells = 5;
 
-        if (last_cell + count_of_new_cells - 1 >= EDITED_TABLE_INFO.cells_size) {
-            unsigned new_size = EDITED_TABLE_INFO.cells_size + count_of_new_cells;
+        // Выделяем память под новую строку
+        if (last_cell + MAX_COLS_IN_TABLE - 1 >= EDITED_TABLE_INFO.cells_size) {
+            unsigned new_size = EDITED_TABLE_INFO.cells_size + MAX_COLS_IN_TABLE;
             TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
             EDITED_TABLE_INFO.cells = realloc_ptr;
             EDITED_TABLE_INFO.cells_size = new_size;
         }
 
+        // Добавляем новую строку в отображаемую таблицу
         data.row_count++;
         data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+
+        // Записываем данные о новой строке
         for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-            data.rows[data.row_count - 1].text[i] = NULL;
+            data.rows[data.row_count - 1].text[i] = '\0';
             EDITED_TABLE_INFO.cells[last_cell + i].col = i;
             EDITED_TABLE_INFO.cells[last_cell + i].row = data.row_count - 1;
-            EDITED_TABLE_INFO.cells[last_cell + i].text = NULL;
+            EDITED_TABLE_INFO.cells[last_cell + i].text = '\0';
         }
 
-        EDITED_TABLE_INFO.cells_count += count_of_new_cells;
+        EDITED_TABLE_INFO.cells_count += MAX_COLS_IN_TABLE;
+        EDITED_TABLE_INFO.row_count_in_table = data.row_count;
+    } else if (DELETE_IS_PRESSED) { // Удаление строки
+        DELETE_IS_PRESSED = false;
+        
+        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
+        unsigned affected_rows = data.row_count - absolute_v_selected - 1;
+        unsigned affected_cols = affected_rows * MAX_COLS_IN_TABLE;
+
+        // Выделяем память под измененные ячейки
+        if (last_cell + MAX_COLS_IN_TABLE - 1 >= EDITED_TABLE_INFO.cells_size) {
+            EDITED_TABLE_INFO.cells_size += affected_cols;
+            TableCell* realloc_ptr = (TableCell*)realloc(
+                EDITED_TABLE_INFO.cells,
+                EDITED_TABLE_INFO.cells_size * sizeof(TableCell)
+            );
+            EDITED_TABLE_INFO.cells = realloc_ptr;
+        }
+
+        // Сдвигаем строки вверх, замещая удаленную строку
+        for (int i = absolute_v_selected; i < data.row_count - 1; i++) {
+            data.rows[i] = data.rows[i + 1];
+
+            for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
+                unsigned edit_index = last_cell + ((i - absolute_v_selected) * MAX_COLS_IN_TABLE) + j;
+                EDITED_TABLE_INFO.cells[edit_index].col = j;
+                EDITED_TABLE_INFO.cells[edit_index].row = i;
+
+                // Требуется приведение от char* к wchar_t*
+                int wide_len = MultiByteToWideChar(CP_UTF8, 0, data.rows[i].text[j], -1, NULL, 0);
+                EDITED_TABLE_INFO.cells[edit_index].text = (wchar_t*)malloc(wide_len * sizeof(wchar_t));
+                MultiByteToWideChar(CP_UTF8, 0, data.rows[i].text[j], -1, EDITED_TABLE_INFO.cells[edit_index].text, wide_len);
+            }
+        }
+
+        // Уменьшаем количество строк в отображаемой таблице
+        data.row_count--;
+        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+
+        // Обновляем количество отслеживаемых ячеек
+        EDITED_TABLE_INFO.cells_count += affected_cols;
+        EDITED_TABLE_INFO.row_count_in_table = data.row_count;
     }
 
     /********************************* EDIT MENU ******************************************/

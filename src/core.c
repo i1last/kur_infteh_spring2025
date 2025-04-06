@@ -12,6 +12,7 @@ bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
 bool UNDEFINED_KEY_IS_PRESSED = false;
 bool CTRL_N_IS_PRESSED = false;
+bool DELETE_IS_PRESSED = false;
 
 int STATE = 0;
 int SUB_STATE = 0;
@@ -23,7 +24,7 @@ int CURSOR_POS = 0;
 wchar_t BUFFER[MAX_BUFFER_LEN] = { 0 };
 wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
-EditedTableInfo EDITED_TABLE_INFO = { NULL, 0, 0 };
+EditedTableInfo EDITED_TABLE_INFO = { NULL, 0, 0, 0 };
 
 pthread_mutex_t mutex;
 
@@ -35,10 +36,20 @@ void* keys_listener(void* arg) {
         switch (pressed_char) {
         case 27: // ESC
             if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
-                ask_to_save_file();
+                if (ask_user("Сохранить файл?")) {
+                    save_file();
+                }
                 STATE = 0;
             } else if (STATE) STATE = 0;
             else IS_RUNNING = false;
+            break;
+        case 330: // DELETE
+            if (STATE == 3 && ask_user("Удалить строку?")) {
+                DELETE_IS_PRESSED = true;
+                pthread_mutex_lock(&mutex);
+                make_tui();
+                pthread_mutex_unlock(&mutex);
+            }
             break;
         case 19: // ctrl + s
             if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {

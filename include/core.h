@@ -27,6 +27,8 @@ extern bool UNDEFINED_KEY_IS_PRESSED;
 
 extern bool CTRL_N_IS_PRESSED;
 
+extern bool DELETE_IS_PRESSED;
+
 extern int STATE;
 
 extern int SUB_STATE;
@@ -52,6 +54,7 @@ typedef struct {
     TableCell* cells;
     unsigned cells_size;
     unsigned cells_count;
+    unsigned row_count_in_table;
 } EditedTableInfo;
 
 typedef struct {
