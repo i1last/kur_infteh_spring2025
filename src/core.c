@@ -11,6 +11,7 @@
 bool IS_RUNNING = true;
 bool ENTER_IS_PRESSED = false;
 bool UNDEFINED_KEY_IS_PRESSED = false;
+bool CTRL_N_IS_PRESSED = false;
 
 int STATE = 0;
 int SUB_STATE = 0;
@@ -42,6 +43,14 @@ void* keys_listener(void* arg) {
         case 19: // ctrl + s
             if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
                 save_file();
+            }
+            break;
+        case 14: // ctrl + n
+            if (STATE == 3) {
+                CTRL_N_IS_PRESSED = true;
+                pthread_mutex_lock(&mutex);
+                make_tui();
+                pthread_mutex_unlock(&mutex);
             }
             break;
         case KEY_UP:

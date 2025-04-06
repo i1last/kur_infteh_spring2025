@@ -244,7 +244,16 @@ void make_widget_writefile(WINDOW* win) {
         }
     }
 
-    /********************************* ENTER LOGIC ******************************************/
+    /********************************* KEYS LOGIC ******************************************/
+    if (CTRL_N_IS_PRESSED) {
+        CTRL_N_IS_PRESSED = false;
+        
+        data.row_count++;
+        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+        for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
+            data.rows[data.row_count - 1].text[i] = NULL;
+        }
+    }
 
     if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;

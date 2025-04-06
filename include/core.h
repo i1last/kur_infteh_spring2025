@@ -25,6 +25,8 @@ extern bool ENTER_IS_PRESSED;
 
 extern bool UNDEFINED_KEY_IS_PRESSED;
 
+extern bool CTRL_N_IS_PRESSED;
+
 extern int STATE;
 
 extern int SUB_STATE;
