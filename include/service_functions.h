@@ -26,7 +26,7 @@ unsigned strlen_utf8(const char* str);
 
 bool file_exists(void);
 
-TableInfo read_csv(FILE* file);
+TableInfo read_csv(void);
 
 int create_file(void);
 

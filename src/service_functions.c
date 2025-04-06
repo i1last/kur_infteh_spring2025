@@ -152,16 +152,52 @@ bool file_exists(void) {
     return false;
 }
 
-TableInfo read_csv(FILE* file) {
+bool is_file_encrypted(FILE* file) {
+    char signature[SIGNATURE_LENGTH + 1] = { 0 };
+    
+    long current_pos = ftell(file);
+    size_t read = fread(signature, 1, SIGNATURE_LENGTH, file);
+    fseek(file, current_pos, SEEK_SET);
+    
+    return (read == SIGNATURE_LENGTH && strcmp(signature, ENCRYPTION_SIGNATURE) == 0);
+}
+
+/*
+Реализует шифрование и дешифрование текста с помощью XOR
+*/
+void encrypt_decrypt_text(char* text, const char* key) {
+    if (!text || !key) return;
+    
+    int key_len = strlen(key);
+    int text_len = strlen(text);
+    
+    for (int i = 0; i < text_len; i++) {
+        if (text[i] == '\n') continue;
+        text[i] ^= key[i % key_len];
+    }
+    
+    return;
+}
+
+TableInfo read_csv(void) {
+    FILE* file = _wfopen(CURRENT_FILENAME, L"r");
+
     char* delim = ";,";
 
     int capacity = 20,
         row_count = 0;
-    char buffer[1024];
-
+    char buffer[MAX_LEN_IN_FILE];
+    bool is_encrypted = is_file_encrypted(file);
     TableRow* rows = calloc(capacity, sizeof(TableRow));
 
+    if (is_encrypted) { // Если файл зашифрован, то пропускаем сигнатуру
+        fseek(file, SIGNATURE_LENGTH, SEEK_SET);
+    }
+
     while ((fgets(buffer, sizeof(buffer), file)) != NULL) {
+        // Дешифруем строку перед обработкой
+        if (is_encrypted) encrypt_decrypt_text(buffer, KEY);
+        
         if (row_count >= capacity) {
             capacity += 20;
             rows = realloc(rows, capacity * sizeof(TableRow));
@@ -183,6 +219,7 @@ TableInfo read_csv(FILE* file) {
     };
     wcsncpy(data.filename, CURRENT_FILENAME, MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN);
 
+    fclose(file);
     return data;
 }
 
@@ -198,15 +235,23 @@ int create_file(void) {
 void save_file(void) { // TODO: добавить проверку на существование файла
     FILE* file = _wfopen(CURRENT_FILENAME, L"w");
 
+    fprintf(file, "%s", ENCRYPTION_SIGNATURE); // Записываем сигнатуру в начало файла
+
+    char buffer[MAX_LEN_IN_FILE];
     for (int i = 0; i < TABLE_INFO.row_count; i++) {
+        buffer[0] = '\0';
+
         for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
             char* cell_text = TABLE_INFO.rows[i].text[j];
             if (cell_text == NULL) cell_text = "";
 
-            fprintf(file, "%s", cell_text);
+            strcat(buffer, cell_text);
 
-            if (j < MAX_COLS_IN_TABLE - 1) fprintf(file, ",");
+            if (j < MAX_COLS_IN_TABLE - 1) strcat(buffer, ",");
         }
+
+        encrypt_decrypt_text(buffer, KEY); // Шифруем строку перед записью
+        fprintf(file, "%s", buffer);
     }
 
     TABLE_INFO.edited_cells = false;

@@ -125,10 +125,8 @@ SUB_STATEs:
 1 - изменение ячейки
 */
 void make_widget_writefile(WINDOW* win) {
-    FILE* file = NULL;
     if (wcscmp(TABLE_INFO.filename, CURRENT_FILENAME)) {
-        file = _wfopen(CURRENT_FILENAME, L"r+");
-        TABLE_INFO = read_csv(file);
+        TABLE_INFO = read_csv();
     }
 
     int total_rows = MAX(TABLE_INFO.row_count, 1);
@@ -411,8 +409,6 @@ void make_widget_writefile(WINDOW* win) {
     delwin(table_win);
     delwin(scroll_win);
     
-    if (file) fclose(file);
-
     return;
 }
 

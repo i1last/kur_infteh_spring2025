@@ -13,9 +13,15 @@
 #define MAX_FILE_EXTENSION_LEN 4
 #define MIN_TERM_COLS 75
 #define MIN_TERM_ROWS 20
+#define MAX_LEN_IN_FILE 1024
+
 
 #define FILE_EXTENSION L".csv"
 #define __INPUTMENU__CHAR_NOT_SUPPORTED "[ (!) Данные символы не поддерживаются ]"
+
+#define KEY "super_secret_key"
+#define ENCRYPTION_SIGNATURE "ENC1"
+#define SIGNATURE_LENGTH 4
 
 typedef struct {
     char* text[MAX_COLS_IN_TABLE];
