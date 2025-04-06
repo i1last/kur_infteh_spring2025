@@ -28,4 +28,6 @@ void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int co
 
 void save_file(void);
 
+void ask_to_save_file(void);
+
 #endif

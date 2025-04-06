@@ -35,7 +35,7 @@ void* keys_listener(void* arg) {
         switch (pressed_char) {
         case 27: // ESC
             if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
-                // TODO: ask_to_save_file();
+                ask_to_save_file();
                 STATE = 0;
             } else if (STATE) STATE = 0;
             else IS_RUNNING = false;

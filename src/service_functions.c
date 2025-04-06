@@ -210,11 +210,28 @@ void save_file(void) { // TODO: добавить проверку на суще�
     return;
 }
 
-// TODO: добавить окно с вопросом о сохранении файла
-// void ask_to_save_file(void) {
-//     WINDOW* ask_win = derwin(stdscr, 3, 30, getmaxy(stdscr) / 2, getmaxx(stdscr) / 2 - 15);
-//     box(ask_win, 0, 0);
-//     mvwprintw(ask_win, 1, 1, "Save file? (y/n)");
-//     wrefresh(ask_win);
-//     delwin(ask_win);
-// }
+void ask_to_save_file(void) {
+    char* question = "Сохранить файл? [Y / n]";
+    int question_len = strlen_utf8(question);
+
+    WINDOW* ask_win = derwin(stdscr, 3, question_len + 2, getmaxy(stdscr) / 2, (getmaxx(stdscr) - question_len) / 2);
+    
+    wattron(ask_win, COLOR_PAIR(1));
+    box(ask_win, 0, 0);
+    mvwprintw(ask_win, 1, 1, question);
+    wattroff(ask_win, COLOR_PAIR(1));
+    
+    wrefresh(ask_win);
+    delwin(ask_win);
+
+    while (1) {
+        int pressed_char = getch();
+
+        if (pressed_char == 'y' || pressed_char == 'Y') {
+            save_file();
+            break;
+        } else if (pressed_char == 'n' || pressed_char == 'N') break;
+    }
+
+    return;
+}
