@@ -54,7 +54,7 @@ void make_box(WINDOW* win) {
 
         snprintf(footer_filename, footer_filename_size + 5, "[ %ls%s ]", 
                 truncated_name, 
-                (TABLE_INFO.edited_cells_count > 0) ? "*" : ""
+                (TABLE_INFO.edited_cells) ? "*" : ""
         );
         
         mvwaddstr(

@@ -24,7 +24,7 @@ typedef struct {
 typedef struct {
     TableRow* rows;
     unsigned row_count;
-    unsigned edited_cells_count;
+    bool edited_cells;
     wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 } TableInfo;
 
@@ -61,7 +61,5 @@ void* keys_listener(void* arg);
 void* term_size_listener(void* arg);
 
 void* state_listener(void* arg);
-
-void* update_tui(void* arg);
 
 #endif

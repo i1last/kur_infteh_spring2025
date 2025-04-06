@@ -206,7 +206,7 @@ void save_file(void) { // TODO: добавить проверку на суще�
         }
     }
 
-    TABLE_INFO.edited_cells_count = 0;
+    TABLE_INFO.edited_cells = false;
     fclose(file);
 
     return;
