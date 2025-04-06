@@ -36,7 +36,7 @@ void make_box(WINDOW* win) {
     char header[] = "[ К/Р: Рахметов А. Р., гр. 4494 ]";
     mvwaddstr(win, 0, getmaxx(win) / 2 - strlen_utf8(header) / 2, header);
 
-    char footer[] = "[ ESC | Enter | ←→↑↓ ]";
+    char footer[] = "[ ESC | Enter | ←→↑↓ | Ctrl + S ]";
     mvwaddstr(win, getmaxy(win) - 1, 2, footer);
 
     return;
