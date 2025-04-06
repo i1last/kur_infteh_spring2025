@@ -23,7 +23,7 @@ int CURSOR_POS = 0;
 wchar_t BUFFER[MAX_BUFFER_LEN] = { 0 };
 wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
-EditedTableInfo EDITED_TABLE_INFO = { NULL, 0, 0, 0 };
+TableInfo TABLE_INFO = { NULL, 0, 0, 0 };
 
 pthread_mutex_t mutex;
 
@@ -34,7 +34,7 @@ void* keys_listener(void* arg) {
         get_wch(&pressed_char);
         switch (pressed_char) {
         case 27: // ESC
-            if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
+            if (STATE == 3 && TABLE_INFO.edited_cells_count > 0) {
                 if (ask_user("Сохранить файл?")) {
                     save_file();
                 }
@@ -53,7 +53,7 @@ void* keys_listener(void* arg) {
             break;
 
         case 19: // ctrl + s
-            if (STATE == 3 && EDITED_TABLE_INFO.cells_count > 0) {
+            if (STATE == 3 && TABLE_INFO.edited_cells_count > 0) {
                 save_file();
             }
             break;
@@ -184,7 +184,7 @@ void* state_listener(void* arg) {
             VERTICAL_SELECTED_OPTION = 0;
             HORIZONTAL_SELECTED_OPTION = 0;
 
-            EDITED_TABLE_INFO = (EditedTableInfo){ NULL, 0, 0 };
+            TABLE_INFO = (TableInfo){ NULL, 0, 0, 0 };
         }
         
         ENTER_IS_PRESSED = false;

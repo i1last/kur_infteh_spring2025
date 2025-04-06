@@ -30,8 +30,6 @@ TableInfo read_csv(FILE* file);
 
 int create_file(void);
 
-void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int col);
-
 void save_file(void);
 
 bool ask_user(char* question);

@@ -192,52 +192,12 @@ int create_file(void) {
     return 0;
 }
 
-void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int col) {
-    char* text;
-    wide_to_char(&wide_text, &text);
-
-    if (data->rows[row].text[col] != NULL) {
-        free(data->rows[row].text[col]);
-        data->rows[row].text[col] = NULL;
-    }
-
-    data->rows[row].text[col] = text;
-    return;
-}
-
 void save_file(void) { // TODO: добавить проверку на существование файла
-    FILE* file = _wfopen(CURRENT_FILENAME, L"r");
-    TableInfo data = read_csv(file);
-    fclose(file);
+    FILE* file = _wfopen(CURRENT_FILENAME, L"w");
 
-    file = _wfopen(CURRENT_FILENAME, L"w");
-
-    // Добавляем измененные ячейки в таблицу
-    for (int i = 0; i < EDITED_TABLE_INFO.cells_count; i++) {
-        int row = EDITED_TABLE_INFO.cells[i].row;
-        int col = EDITED_TABLE_INFO.cells[i].col;
-
-        if (row > data.row_count - 1) {
-            data.row_count++;
-            data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
-            for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
-                data.rows[data.row_count - 1].text[j] = NULL;
-            }
-        }
-
-        if (EDITED_TABLE_INFO.row_count_in_table < data.row_count) {
-            data.row_count = EDITED_TABLE_INFO.row_count_in_table;
-            data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
-        }
-
-        wchar_t* wide_text = EDITED_TABLE_INFO.cells[i].text;
-        write_widestr_to_table(wide_text, &data, row, col);
-    }
-
-    // Записываем измененную таблицу в файл
-    for (int i = 0; i < data.row_count; i++) {
+    for (int i = 0; i < TABLE_INFO.row_count; i++) {
         for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
-            char* cell_text = data.rows[i].text[j];
+            char* cell_text = TABLE_INFO.rows[i].text[j];
             if (cell_text == NULL) cell_text = "";
 
             fprintf(file, "%s", cell_text);
@@ -246,11 +206,7 @@ void save_file(void) { // TODO: добавить проверку на суще�
         }
     }
 
-    free(EDITED_TABLE_INFO.cells);
-    EDITED_TABLE_INFO.cells = NULL;
-    EDITED_TABLE_INFO.cells_count = 0;
-    EDITED_TABLE_INFO.cells_size = 0;
-
+    TABLE_INFO.edited_cells_count = 0;
     fclose(file);
 
     return;

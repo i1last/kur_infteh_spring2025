@@ -17,6 +17,17 @@
 #define FILE_EXTENSION L".csv"
 #define __INPUTMENU__CHAR_NOT_SUPPORTED "[ (!) Данные символы не поддерживаются ]"
 
+typedef struct {
+    char* text[MAX_COLS_IN_TABLE];
+} TableRow;
+
+typedef struct {
+    TableRow* rows;
+    unsigned row_count;
+    unsigned edited_cells_count;
+    wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
+} TableInfo;
+
 extern pthread_mutex_t mutex;
 
 extern bool IS_RUNNING;
@@ -43,29 +54,7 @@ extern wchar_t BUFFER[MAX_BUFFER_LEN];
 
 extern wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
 
-typedef struct {
-    int col, row;
-    wchar_t* text;
-} TableCell;
-
-typedef struct {
-    TableCell* cells;
-    unsigned cells_size;
-    unsigned cells_count;
-    unsigned row_count_in_table;
-} EditedTableInfo;
-
-typedef struct {
-    char* text[MAX_COLS_IN_TABLE];
-} TableRow;
-
-typedef struct {
-    TableRow* rows;
-    int row_count;
-    wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
-} TableInfo;
-
-extern EditedTableInfo EDITED_TABLE_INFO;
+extern TableInfo TABLE_INFO;
 
 void* keys_listener(void* arg);
 

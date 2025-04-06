@@ -134,9 +134,11 @@ SUB_STATEs:
 */
 void make_widget_writefile(WINDOW* win) {
     FILE* file = _wfopen(CURRENT_FILENAME, L"r+");
-    static TableInfo data = { NULL, 0, { 0 } };
-    if (wcscmp(data.filename, CURRENT_FILENAME)) 
-        data = read_csv(file);
+    // static TableInfo data = { NULL, 0, { 0 } };
+    // if (wcscmp(data.filename, CURRENT_FILENAME)) 
+    //     data = read_csv(file);
+    if (wcscmp(TABLE_INFO.filename, CURRENT_FILENAME)) TABLE_INFO = read_csv(file);
+    TableInfo data = TABLE_INFO;
 
     WINDOW* header_win = derwin(win, 2, getmaxx(win), 1, 0);
     WINDOW* table_win  = derwin(win, getmaxy(win) - 4, getmaxx(win), 3, 0);
@@ -253,30 +255,13 @@ void make_widget_writefile(WINDOW* win) {
     // === Изменение единичной ячейки ===
     else if (ENTER_IS_PRESSED && SUB_STATE == 1) {
         ENTER_IS_PRESSED = false;
+        char* text;
+        wchar_t* buffer_ptr = BUFFER;
+        wide_to_char(&buffer_ptr, &text);
 
-        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
-
-        // Выделяем память под новую ячейку
-        if (last_cell >= EDITED_TABLE_INFO.cells_size) { // TODO: добавить проверку realloc_ptr и wcsdup на NULL
-            unsigned new_size = EDITED_TABLE_INFO.cells_size + 1;
-            TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
-            EDITED_TABLE_INFO.cells = realloc_ptr;
-            EDITED_TABLE_INFO.cells_size = new_size;
-        }
-   
-        // Записываем данные в новую ячейку
-        EDITED_TABLE_INFO.cells[last_cell].col = h_selected;
-        EDITED_TABLE_INFO.cells[last_cell].row = absolute_v_selected;
-        EDITED_TABLE_INFO.cells[last_cell].text = wcsdup(BUFFER);
-        
-        write_widestr_to_table(
-            EDITED_TABLE_INFO.cells[last_cell].text,
-            &data,
-            EDITED_TABLE_INFO.cells[last_cell].row,
-            EDITED_TABLE_INFO.cells[last_cell].col
-        );
-    
-        EDITED_TABLE_INFO.cells_count += 1;
+        if (h_selected == MAX_COLS_IN_TABLE - 1) strcat(text, "\n");
+        TABLE_INFO.rows[absolute_v_selected].text[h_selected] = text;
+        TABLE_INFO.edited_cells_count += 1;
 
         SUB_STATE = 0;
     } 
@@ -285,71 +270,35 @@ void make_widget_writefile(WINDOW* win) {
     else if (COMMAND_KEY_IS_PRESSED == 14) {
         COMMAND_KEY_IS_PRESSED = 0;
 
-        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
-
-        // Выделяем память под новую строку
-        if (last_cell + MAX_COLS_IN_TABLE - 1 >= EDITED_TABLE_INFO.cells_size) {
-            unsigned new_size = EDITED_TABLE_INFO.cells_size + MAX_COLS_IN_TABLE;
-            TableCell* realloc_ptr = (TableCell*)realloc(EDITED_TABLE_INFO.cells, new_size * sizeof(TableCell));
-            EDITED_TABLE_INFO.cells = realloc_ptr;
-            EDITED_TABLE_INFO.cells_size = new_size;
-        }
-
         // Добавляем новую строку в отображаемую таблицу
-        data.row_count++;
-        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+        TABLE_INFO.row_count++;
+        TABLE_INFO.rows = (TableRow*)realloc(TABLE_INFO.rows, TABLE_INFO.row_count * sizeof(TableRow));
 
         // Записываем данные о новой строке
         for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-            data.rows[data.row_count - 1].text[i] = '\0';
-            EDITED_TABLE_INFO.cells[last_cell + i].col = i;
-            EDITED_TABLE_INFO.cells[last_cell + i].row = data.row_count - 1;
-            EDITED_TABLE_INFO.cells[last_cell + i].text = '\0';
+            TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = '\0';
         }
 
-        EDITED_TABLE_INFO.cells_count += MAX_COLS_IN_TABLE;
-        EDITED_TABLE_INFO.row_count_in_table = data.row_count;
+        TABLE_INFO.edited_cells_count += MAX_COLS_IN_TABLE;
     } 
     
     // === Удаление строки ===
     else if (COMMAND_KEY_IS_PRESSED == 330) {
         COMMAND_KEY_IS_PRESSED = 0;
-        
-        unsigned last_cell = EDITED_TABLE_INFO.cells_count;
-        unsigned affected_rows = data.row_count - absolute_v_selected - 1;
-        unsigned affected_cols = affected_rows * MAX_COLS_IN_TABLE;
-
-        // Выделяем память под измененные ячейки
-        if (last_cell + MAX_COLS_IN_TABLE - 1 >= EDITED_TABLE_INFO.cells_size) {
-            EDITED_TABLE_INFO.cells_size += affected_cols;
-            TableCell* realloc_ptr = (TableCell*)realloc(
-                EDITED_TABLE_INFO.cells,
-                EDITED_TABLE_INFO.cells_size * sizeof(TableCell)
-            );
-            EDITED_TABLE_INFO.cells = realloc_ptr;
-        }
 
         // Сдвигаем строки вверх, замещая удаленную строку
         for (int i = absolute_v_selected; i < data.row_count - 1; i++) {
-            data.rows[i] = data.rows[i + 1];
-
-            for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
-                unsigned edit_index = last_cell + ((i - absolute_v_selected) * MAX_COLS_IN_TABLE) + j;
-                EDITED_TABLE_INFO.cells[edit_index].col = j;
-                EDITED_TABLE_INFO.cells[edit_index].row = i;
-
-                // Требуется приведение от char* к wchar_t*
-                char_to_wide(&data.rows[i].text[j], &EDITED_TABLE_INFO.cells[edit_index].text);
-            }
+            TABLE_INFO.rows[i] = TABLE_INFO.rows[i + 1];
         }
 
         // Уменьшаем количество строк в отображаемой таблице
-        data.row_count--;
-        data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
+        TABLE_INFO.row_count--;
+        TABLE_INFO.rows = (TableRow*)realloc(TABLE_INFO.rows, TABLE_INFO.row_count * sizeof(TableRow));
 
         // Обновляем количество отслеживаемых ячеек
-        EDITED_TABLE_INFO.cells_count += affected_cols;
-        EDITED_TABLE_INFO.row_count_in_table = data.row_count;
+        unsigned affected_rows = data.row_count - absolute_v_selected - 1;
+        unsigned affected_cols = affected_rows * MAX_COLS_IN_TABLE;
+        TABLE_INFO.edited_cells_count += affected_cols;
     }
 
     // === Сортировка по возрастанию ===
@@ -357,7 +306,7 @@ void make_widget_writefile(WINDOW* win) {
         COMMAND_KEY_IS_PRESSED = 0;
 
         // Сортировка по возрастанию
-        sort_table(&data, h_selected, true);
+        sort_table(&TABLE_INFO, h_selected, true);
 
         pthread_t update_tui_TID;
         pthread_create(&update_tui_TID, NULL, update_tui, NULL);
@@ -369,7 +318,7 @@ void make_widget_writefile(WINDOW* win) {
         COMMAND_KEY_IS_PRESSED = 0;
 
         // Сортировка по убыванию
-        sort_table(&data, h_selected, false);
+        sort_table(&TABLE_INFO, h_selected, false);
 
         pthread_t update_tui_TID;
         pthread_create(&update_tui_TID, NULL, update_tui, NULL);
