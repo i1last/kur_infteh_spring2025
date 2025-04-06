@@ -61,10 +61,13 @@ int convert_strlen_to_strlen_utf8(int condition, char** text) {
 }
 
 WINDOW* create_box_input_window(WINDOW** win) {
-    WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2 + 1, getmaxy(*win) / 2, getmaxx(*win) / 2 - MAX_BUFFER_LEN / 2);
+    WINDOW* box_win = subwin(*win, 3, MAX_BUFFER_LEN + 2 + 1, getmaxy(*win) / 2, (getmaxx(*win) - MAX_BUFFER_LEN) / 2);
     //                       для рамок слева и справа -^   ^- для отображения курсора
     box(box_win, 0, 0);
-
+    if (UNDEFINED_KEY_IS_PRESSED) {
+        mvwprintw(box_win, 2, 2, __INPUTMENU__CHAR_NOT_SUPPORTED);
+        UNDEFINED_KEY_IS_PRESSED = false;
+    }
     return box_win;
 }
 
@@ -231,9 +234,15 @@ bool ask_user(char* question) {
     while (1) {
         int pressed_char = getch();
 
-        if (pressed_char == 'y' || pressed_char == 'Y') {
+        if (pressed_char == 'y'  ||
+            pressed_char == 'Y'  ||
+            pressed_char == 1085 || // н
+            pressed_char == 1053) { // Н
             return true;
-        } else if (pressed_char == 'n' || pressed_char == 'N') {
+        } else if (pressed_char == 'n'  || 
+                   pressed_char == 'N'  ||
+                   pressed_char == 1090 || // т
+                   pressed_char == 1058) { // Т
             return false;
         }
     }

@@ -23,7 +23,7 @@ int CURSOR_POS = 0;
 wchar_t BUFFER[MAX_BUFFER_LEN] = { 0 };
 wchar_t CURRENT_FILENAME[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN] = { 0 };
 
-TableInfo TABLE_INFO = { NULL, 0, false, 0 };
+TableInfo TABLE_INFO = { NULL, 0, false, 0, false, 0 };
 
 pthread_mutex_t mutex;
 
@@ -68,17 +68,8 @@ void* keys_listener(void* arg) {
             break;
 
         case 21: // ctrl + u
-            COMMAND_KEY_IS_PRESSED = pressed_char;
-            break;
-
         case 4: // ctrl + d
-            COMMAND_KEY_IS_PRESSED = pressed_char;
-            break;
-
         case 6: // ctrl + f
-            COMMAND_KEY_IS_PRESSED = pressed_char;
-            break;
-
         case 9: // ctrl + i
             COMMAND_KEY_IS_PRESSED = pressed_char;
             break;
@@ -184,7 +175,7 @@ void* state_listener(void* arg) {
             VERTICAL_SELECTED_OPTION = 0;
             HORIZONTAL_SELECTED_OPTION = 0;
 
-            TABLE_INFO = (TableInfo){ NULL, 0, false, 0 };
+            TABLE_INFO = (TableInfo){ NULL, 0, false, 0, false, 0 };
         }
         
         ENTER_IS_PRESSED = false;
@@ -193,6 +184,7 @@ void* state_listener(void* arg) {
         make_tui();
         pthread_mutex_unlock(&mutex);
         
+        if (SUB_STATE == -1) SUB_STATE = 0;
         prev_state = STATE;
         prev_sub_state = SUB_STATE;
     }

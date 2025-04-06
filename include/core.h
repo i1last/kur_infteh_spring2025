@@ -26,6 +26,8 @@ typedef struct {
     unsigned row_count;
     bool edited_cells;
     wchar_t filename[MAX_BUFFER_LEN + MAX_FILE_EXTENSION_LEN];
+    bool search_mode;
+    char* search_text;
 } TableInfo;
 
 extern pthread_mutex_t mutex;
