@@ -155,10 +155,10 @@ int create_file(void) {
 }
 
 void write_widestr_to_table(wchar_t* wide_text, TableInfo* data, int row, int col) {
-    size_t required_size = wcstombs(NULL, wide_text, 0);
+    size_t required_size = WideCharToMultiByte(CP_UTF8, 0, wide_text, -1, NULL, 0, NULL, NULL);
         
     char* text = malloc(required_size + 1);
-    wcstombs(text, wide_text, required_size + 1);
+    WideCharToMultiByte(CP_UTF8, 0, wide_text, -1, text, required_size, NULL, NULL);
 
     if (data->rows[row].text[col] != NULL) {
         free(data->rows[row].text[col]);
