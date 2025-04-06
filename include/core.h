@@ -38,6 +38,10 @@ typedef struct {
 
 extern pthread_mutex_t mutex;
 
+extern pthread_cond_t is_running_cond;
+
+extern pthread_cond_t state_changed_cond;
+
 extern bool IS_RUNNING;
 
 extern bool ENTER_IS_PRESSED;

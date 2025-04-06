@@ -17,7 +17,7 @@ TAR = $(PREFIX_BIN)$(TARGET)
 all : $(TAR)
 
 clean : 
-	del /q $(subst /,\, $(PREFIX_BIN)), $(subst /,\, $(PREFIX_OBJ))
+	del /q $(subst /,\, $(PREFIX_BIN)*.exe), $(subst /,\, $(PREFIX_OBJ))
 
 exec : all
 	start ".\" ".\bin\kur.exe" 

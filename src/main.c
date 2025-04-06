@@ -24,6 +24,8 @@ int main(int argc, char* argv[]) {
     make_tui();
 
     pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&is_running_cond, NULL);
+    pthread_cond_init(&state_changed_cond, NULL);
 
     pthread_t keys_listener_TID, term_size_listener_TID, state_listener_TID;
     pthread_create(&keys_listener_TID, NULL, keys_listener, NULL);
@@ -47,7 +49,21 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    while (IS_RUNNING);
+    while (IS_RUNNING) {
+        pthread_mutex_lock(&mutex);
+        pthread_cond_wait(&is_running_cond, &mutex);
+        pthread_mutex_unlock(&mutex);
+    }
     
+    pthread_detach(keys_listener_TID);
+    pthread_detach(term_size_listener_TID);
+    pthread_detach(state_listener_TID);
+
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&is_running_cond);
+    pthread_cond_destroy(&state_changed_cond);
+
+    endwin();
+
     return 0;
 }
