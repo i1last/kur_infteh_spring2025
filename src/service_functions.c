@@ -205,6 +205,11 @@ void save_file(void) { // TODO: добавить проверку на суще�
         }
     }
 
+    free(EDITED_TABLE_INFO.cells);
+    EDITED_TABLE_INFO.cells = NULL;
+    EDITED_TABLE_INFO.cells_count = 0;
+    EDITED_TABLE_INFO.cells_size = 0;
+
     fclose(file);
 
     return;

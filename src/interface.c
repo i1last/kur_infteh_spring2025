@@ -33,12 +33,37 @@ void make_widget(WINDOW* win) {
 void make_box(WINDOW* win) {
     box(win, 0, 0);
 
-    char header[] = "[ К/Р: Рахметов А. Р., гр. 4494 ]";
+    char* header = "[ К/Р: Рахметов А. Р., гр. 4494 ]";
     mvwaddstr(win, 0, getmaxx(win) / 2 - strlen_utf8(header) / 2, header);
 
-    char footer[] = "[ ESC | Enter | ←→↑↓ | Ctrl + S | Ctrl + N ]";
+    char* footer = "[ ESC | Enter | ←→↑↓ | Ctrl + S | Ctrl + N ]";
     mvwaddstr(win, getmaxy(win) - 1, 2, footer);
 
+    if (STATE == 3) {
+        const unsigned footer_filename_size = 16;
+        char footer_filename[footer_filename_size];
+
+        wchar_t truncated_name[16] = { 0 }; // 12 символов + "..." + '\0'
+        if (wcslen(CURRENT_FILENAME) > footer_filename_size - 4) {
+            wcsncpy(truncated_name, CURRENT_FILENAME, footer_filename_size - 4);
+            wcscat(truncated_name, L"...");
+            truncated_name[footer_filename_size - 1] = '\0';
+        } else {
+            wcscpy(truncated_name, CURRENT_FILENAME);
+        }
+
+        snprintf(footer_filename, footer_filename_size + 5, "[ %ls%s ]", 
+                truncated_name, 
+                (EDITED_TABLE_INFO.cells_count > 0) ? "*" : ""
+        );
+        
+        mvwaddstr(
+            win,
+            getmaxy(win) - 1,
+            getmaxx(win) - strlen_utf8(footer_filename) - 2,
+            footer_filename
+        );
+    }
     return;
 }
 

@@ -245,16 +245,6 @@ void make_widget_writefile(WINDOW* win) {
     }
 
     /********************************* KEYS LOGIC ******************************************/
-    // if (CTRL_N_IS_PRESSED) {
-    //     CTRL_N_IS_PRESSED = false;
-        
-    //     data.row_count++;
-    //     data.rows = (TableRow*)realloc(data.rows, data.row_count * sizeof(TableRow));
-    //     for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-    //         data.rows[data.row_count - 1].text[i] = NULL;
-    //     }
-    // } WIP
-
     if (ENTER_IS_PRESSED && SUB_STATE == 0) {
         ENTER_IS_PRESSED = false;
         SUB_STATE = 1;
@@ -305,7 +295,7 @@ void make_widget_writefile(WINDOW* win) {
             EDITED_TABLE_INFO.cells[last_cell + i].row = data.row_count - 1;
             EDITED_TABLE_INFO.cells[last_cell + i].text = NULL;
         }
-        
+
         EDITED_TABLE_INFO.cells_count += count_of_new_cells;
     }
 
