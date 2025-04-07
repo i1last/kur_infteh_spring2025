@@ -19,7 +19,7 @@
 #define FILE_EXTENSION L".csv"
 #define __INPUTMENU__CHAR_NOT_SUPPORTED "[ (!) Данные символы не поддерживаются ]"
 
-#define KEY "super_secret_key"
+#define KEY "i_love_pascal"
 #define ENCRYPTION_SIGNATURE "ENC1"
 #define SIGNATURE_LENGTH 4
 
