@@ -11,6 +11,4 @@ void make_widget_openfile(WINDOW* win);
 
 void make_widget_writefile(WINDOW* win);
 
-void make_widget_about(WINDOW* win);
-
 #endif

@@ -18,10 +18,6 @@ void make_widget(WINDOW* win) {
     case 3:  // write file
         make_widget_writefile(win);
         break;
-    case 4:  // about
-        make_widget_about(win);
-        break;
-
     default:  // homepage
         make_widget_homepage(win);
         break;

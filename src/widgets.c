@@ -12,7 +12,6 @@ void make_widget_homepage(WINDOW* win) {
     char* options[] = {
         " Создать файл  ",  // STATE 1
         " Открыть файл  ",  // STATE 2
-        " О работе      ",  // STATE 4
         " Выход         "   // EXIT
     };
     
@@ -28,11 +27,9 @@ void make_widget_homepage(WINDOW* win) {
         case 1:
             STATE = 2;
             break;
-        case 2:
-            STATE = 4;
-            break;
         default:
             IS_RUNNING = false;
+            pthread_cond_broadcast(&is_running_cond);
             break;
         }
         return;
@@ -409,10 +406,5 @@ void make_widget_writefile(WINDOW* win) {
     delwin(table_win);
     delwin(scroll_win);
     
-    return;
-}
-
-void make_widget_about(WINDOW* win) {
-
     return;
 }
