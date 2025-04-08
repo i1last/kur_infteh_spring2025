@@ -191,7 +191,7 @@ void make_widget_writefile(WINDOW* win) {
             unsigned text_col_index = j;
 
             char* text = TABLE_INFO.rows[text_row_index].text[text_col_index];
-            if (text == NULL) text = " ";
+            if (text == NULL || *text == '\0' || strcmp(text, "") == 0) text = " ";
             unsigned text_len = strlen_utf8(text);
             
             int start_x_cord = get_start_x_cord_of_cell(j, cols_width, text_len, table_options[j]);
@@ -264,6 +264,9 @@ void make_widget_writefile(WINDOW* win) {
         wchar_t* buffer_ptr = BUFFER;
         wide_to_char(&buffer_ptr, &text);
 
+        if (text == NULL || *text == '\0' || strcmp(text, "") == 0)
+            text = " ";
+
         if (h_selected == MAX_COLS_IN_TABLE - 1) strcat(text, "\n");
         TABLE_INFO.rows[absolute_v_selected].text[h_selected] = text;
         TABLE_INFO.edited_cells = true;
@@ -281,7 +284,8 @@ void make_widget_writefile(WINDOW* win) {
 
         // Записываем данные о новой строке
         for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-            TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = '\0';
+            TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " ";
+            if (i == MAX_COLS_IN_TABLE - 1) TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " \n";
         }
 
         TABLE_INFO.edited_cells = true;

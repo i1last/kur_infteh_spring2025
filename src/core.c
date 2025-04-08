@@ -44,10 +44,8 @@ void* keys_listener(void* arg) {
                     save_file();
                 }
                 STATE = 0;
-                pthread_cond_signal(&state_changed_cond);
             } else if (STATE) {
                 STATE = 0;
-                pthread_cond_signal(&state_changed_cond);
             } else {
                 IS_RUNNING = false;
                 pthread_cond_broadcast(&is_running_cond);
@@ -97,7 +95,6 @@ void* keys_listener(void* arg) {
 
         case 10: // ENTER
             ENTER_IS_PRESSED = true;
-            pthread_cond_signal(&state_changed_cond);
             break;
 
         case 8: // BACKSPACE
@@ -145,7 +142,7 @@ void* keys_listener(void* arg) {
 
         make_tui();
         pthread_mutex_unlock(&mutex);
-        Sleep(50);
+        pthread_cond_signal(&state_changed_cond);
     }
 
     return NULL;
@@ -175,28 +172,25 @@ void* state_listener(void* arg) {
             pthread_cond_wait(&state_changed_cond, &mutex);
         }
 
-        if (STATE != prev_state || SUB_STATE != prev_sub_state) {
-            memset(BUFFER, '\0', sizeof(BUFFER));
-            CURRENT_BUFFER_LEN = 0;
-            CURSOR_POS = 0;
-            COMMAND_KEY_IS_PRESSED = 0;
+        memset(BUFFER, '\0', sizeof(BUFFER));
+        CURRENT_BUFFER_LEN = 0;
+        CURSOR_POS = 0;
+        COMMAND_KEY_IS_PRESSED = 0;
 
-            // if only STATE changed
-            if (STATE != prev_state) {
-                VERTICAL_SELECTED_OPTION = 0;
-                HORIZONTAL_SELECTED_OPTION = 0;
+        // if only STATE changed
+        if (STATE != prev_state) {
+            VERTICAL_SELECTED_OPTION = 0;
+            HORIZONTAL_SELECTED_OPTION = 0;
 
-                TABLE_INFO = (TableInfo){ NULL, 0, false, 0, false, 0 };
-            }
-            
-            ENTER_IS_PRESSED = false;
-            
-            make_tui();
+            TABLE_INFO = (TableInfo){ NULL, 0, false, 0, false, 0 };
         }
+        
+        ENTER_IS_PRESSED = false;
         
         if (SUB_STATE == -1) SUB_STATE = 0;
         prev_state = STATE;
         prev_sub_state = SUB_STATE;
+        make_tui();
         pthread_mutex_unlock(&mutex);
     }
 

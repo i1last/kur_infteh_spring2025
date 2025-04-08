@@ -213,6 +213,14 @@ TableInfo read_csv(void) {
         row_count++;
     }
 
+    // Если файл пуст
+    if (row_count == 0) for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
+        rows[0].text[i] = " ";
+        if (i == MAX_COLS_IN_TABLE - 1) rows[0].text[i] = " \n";
+    }
+    row_count = MAX(row_count, 1);
+    rows = (TableRow*)realloc(rows, row_count * sizeof(TableRow));
+
     TableInfo data = {
         .rows = rows,
         .row_count = row_count,
@@ -250,7 +258,7 @@ void save_file(void) { // TODO: добавить проверку на суще�
             if (j < MAX_COLS_IN_TABLE - 1) strcat(buffer, ",");
         }
 
-        encrypt_decrypt_text(buffer, KEY); // Шифруем строку перед записью
+        // encrypt_decrypt_text(buffer, KEY); // Шифруем строку перед записью
         fprintf(file, "%s", buffer);
     }
 
