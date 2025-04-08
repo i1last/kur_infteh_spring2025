@@ -258,7 +258,7 @@ void save_file(void) { // TODO: добавить проверку на суще�
             if (j < MAX_COLS_IN_TABLE - 1) strcat(buffer, ",");
         }
 
-        // encrypt_decrypt_text(buffer, KEY); // Шифруем строку перед записью
+        encrypt_decrypt_text(buffer, KEY); // Шифруем строку перед записью
         fprintf(file, "%s", buffer);
     }
 
