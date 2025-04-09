@@ -114,7 +114,7 @@ void* keys_listener(void* arg) {
             break;
 
         default:
-            if (CURRENT_BUFFER_LEN < MAX_BUFFER_LEN && (
+            if (CURRENT_BUFFER_LEN < MAX_BUFFER_LEN - 1 && (
                     48   <= pressed_char && pressed_char <= 57   ||  // 0..9
                     65   <= pressed_char && pressed_char <= 90   ||  // A..Z
                     97   <= pressed_char && pressed_char <= 122  ||  // a..z

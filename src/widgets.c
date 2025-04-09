@@ -2,6 +2,8 @@
 #include <pthread.h>
 #include <string.h>
 #include <time.h>
+#include <windows.h>
+#include <ctype.h>
 #include "widgets.h"
 #include "service_functions.h"
 #include "core.h"
@@ -185,6 +187,9 @@ void make_widget_writefile(WINDOW* win) {
     /********************************* TABLE  WIN ******************************************/
     for (int i = 0; i < visible_rows; i++) {
         if (i >= total_rows) break;
+        char number_of_line[3];
+        sprintf(number_of_line, "%d", i+1);
+        mvwaddstr(table_win, i, 0, number_of_line);
 
         for (int j = 0; j < MAX_COLS_IN_TABLE; j++) {
             unsigned text_row_index = i + first_row;
@@ -264,12 +269,44 @@ void make_widget_writefile(WINDOW* win) {
         wchar_t* buffer_ptr = BUFFER;
         wide_to_char(&buffer_ptr, &text);
 
-        if (text == NULL || *text == '\0' || strcmp(text, "") == 0)
-            text = " ";
+        bool no_edit_cell = false;
+        
+        // Проверка на формат строк
+        if (h_selected == 2) { // Формат
+            bool is_avaible_format = false;
+            char* text_avaible[6] = { "А0", "А1", "А2", "А3", "А4", "А5" };
+            for (int i = 0; i < 6; i++) {
+                if (strcmp(text, text_avaible[i]) == 0) {
+                    is_avaible_format = true;
+                    break;
+                }
+            }
+            if (!is_avaible_format) no_edit_cell = true;
 
-        if (h_selected == MAX_COLS_IN_TABLE - 1) strcat(text, "\n");
-        TABLE_INFO.rows[absolute_v_selected].text[h_selected] = text;
-        TABLE_INFO.edited_cells = true;
+        }
+        if (h_selected == 4) { // Год
+            char* end_ptr;
+            int year = (int)strtol(text, &end_ptr, 10);
+            
+            SYSTEMTIME st;
+            GetSystemTime(&st);
+            int current_year = st.wYear;
+            
+            if (!(1500 <= year && year <= current_year) || *end_ptr != '\0')
+                no_edit_cell = true;
+        }
+
+        // Ограничения, если введенная строка пустая
+        if (text == NULL || *text == '\0' || strcmp(text, "") == 0) {
+            text = " ";
+            if (h_selected == MAX_COLS_IN_TABLE - 1) text = " \n";
+        }
+
+        // Внесение изменений
+        if (!no_edit_cell) {
+            TABLE_INFO.rows[absolute_v_selected].text[h_selected] = text;
+            TABLE_INFO.edited_cells = true;
+        }
 
         SUB_STATE = 0;
     } 
@@ -277,19 +314,26 @@ void make_widget_writefile(WINDOW* win) {
     // === Добавление новой строки ===
     else if (COMMAND_KEY_IS_PRESSED == 14) {
         COMMAND_KEY_IS_PRESSED = 0;
-
-        // Добавляем новую строку в отображаемую таблицу
-        TABLE_INFO.row_count++;
-        TABLE_INFO.rows = (TableRow*)realloc(TABLE_INFO.rows, TABLE_INFO.row_count * sizeof(TableRow));
-
-        // Записываем данные о новой строке
+        bool prev_row_is_none = false;
         for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
-            TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " ";
-            if (i == MAX_COLS_IN_TABLE - 1) TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " \n";
+            if (strcmp(TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i], " ") == 0) prev_row_is_none = true;
         }
+        if (strcmp(TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[MAX_COLS_IN_TABLE - 1], " \n") == 0) prev_row_is_none = true;
 
-        TABLE_INFO.edited_cells = true;
-        SUB_STATE = -1;
+        if (!prev_row_is_none) {
+            // Добавляем новую строку в отображаемую таблицу
+            TABLE_INFO.row_count++;
+            TABLE_INFO.rows = (TableRow*)realloc(TABLE_INFO.rows, TABLE_INFO.row_count * sizeof(TableRow));
+    
+            // Записываем данные о новой строке
+            for (int i = 0; i < MAX_COLS_IN_TABLE; i++) {
+                TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " ";
+                if (i == MAX_COLS_IN_TABLE - 1) TABLE_INFO.rows[TABLE_INFO.row_count - 1].text[i] = " \n";
+            }
+    
+            TABLE_INFO.edited_cells = true;
+            SUB_STATE = -1;
+        } 
     } 
     
     // === Удаление строки ===
